@@ -5,7 +5,7 @@
     "license": "MIT",
     "autoload": {
         "psr-4": {
-            "Digitalvortex\\SamplePhpCode\\": "src/"
+            "App\\": "src/"
         }
     },
     "authors": [
@@ -14,5 +14,8 @@
             "email": "michael.kingsnorth@scrambletech.ca"
         }
     ],
-    "require": {}
+    "require-dev": {
+        "phpunit/phpunit": "^11.3",
+        "phpstan/phpstan": "^1.11"
+    }
 }
