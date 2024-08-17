@@ -21,3 +21,6 @@
 # Ignore OS generated files
 .DS_Store
 Thumbs.db
+
+# Ignore Composer lock file
+composer.lock
