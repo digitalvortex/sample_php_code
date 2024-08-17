@@ -1,0 +1,18 @@
+{
+    "name": "digitalvortex/sample_php_code",
+    "description": "Sample MVC, Dependency Injection example code",
+    "type": "project",
+    "license": "MIT",
+    "autoload": {
+        "psr-4": {
+            "Digitalvortex\\SamplePhpCode\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Michael Kingsnorth",
+            "email": "michael.kingsnorth@scrambletech.ca"
+        }
+    ],
+    "require": {}
+}
