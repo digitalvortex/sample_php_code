@@ -28,6 +28,6 @@ class LoadEnvTest extends TestCase
     {
         $this->expectException(\InvalidArgumentException::class);
         LoadEnv::load('non_existent_file.env');
-        
+
     }
 }
