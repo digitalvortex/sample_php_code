@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace App\Migrations;
 
 use PDO;
+use App\Interfaces\MigrationInterface;
 
 /**
  * Class SessionsMigration
@@ -12,7 +13,7 @@ use PDO;
  *
  * @package App\Migrations
  */
-class SessionsMigration
+class SessionsMigration implements MigrationInterface
 {
     /**
      * @var PDO The PDO instance for database connection.

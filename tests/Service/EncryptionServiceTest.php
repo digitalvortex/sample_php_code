@@ -2,7 +2,7 @@
 declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
-use App\Service\Encryption;
+use App\Service\EncryptionService;
 
 /**
  * Class EncryptionTest
@@ -14,7 +14,7 @@ class EncryptionServiceTest extends TestCase
     /**
      * @var Encryption The Encryption instance.
      */
-    private Encryption $encryption;
+    private EncryptionService $encryption;
 
     /**
      * Set up the test environment.
@@ -23,7 +23,7 @@ class EncryptionServiceTest extends TestCase
     {
         // Set a mock environment variable for the encryption key
         $_ENV['KEY'] = base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
-        $this->encryption = new Encryption();
+        $this->encryption = new EncryptionService();
     }
 
     /**
@@ -48,7 +48,7 @@ class EncryptionServiceTest extends TestCase
         $this->expectExceptionMessage('Key not set');
 
         unset($_ENV['KEY']);
-        new Encryption();
+        new EncryptionService();
     }
 
     /**
@@ -60,7 +60,7 @@ class EncryptionServiceTest extends TestCase
         $this->expectExceptionMessage('Key length must be ' . SODIUM_CRYPTO_SECRETBOX_KEYBYTES . ' bytes');
 
         $_ENV['KEY'] = base64_encode('invalid_key');
-        new Encryption();
+        new EncryptionService();
     }
 
     /**

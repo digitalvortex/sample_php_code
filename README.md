@@ -11,6 +11,7 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Testing with PHPUnit**: Unit tests have been written using PHPUnit to ensure that key components of the framework, such as the PDO connection, work correctly.
 - **Encryption Service**: A service that provides encryption and decryption functionalities using the sodium library.
 - **SetKey Utility**: A utility script for generating a sodium key for the user to manually save to the `.env` file.
+- **Interfaces**: Interfaces are being added to enforce standard methods and promote consistency across the codebase.
 
 ## Progress
 
@@ -21,10 +22,11 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Unit Tests**: PHPUnit tests have been written to verify the functionality of the `DatabaseService`, including checking the PDO connection and database existence.
 - **Encryption Service**: A service that provides encryption and decryption functionalities using the sodium library.
 - **SetKey Utility**: A utility script for generating a sodium key for the user to manually save to the `.env` file.
+- **Custom DI Container**: A basic dependency injection container that registers and resolves services.
+- **Interfaces**: Added interfaces such as `MigrationInterface` and `DatabaseDefinitionsInterface` to enforce standard methods.
 
 ### Next Steps
 
-- **Custom DI Container**: Implement a basic dependency injection container that registers and resolves services.
 - **Models**: Implement models to interact with the database.
 - **Views**: Create basic views to render HTML output.
 - **Controllers**: Implement controllers to handle requests and manage application flow.
@@ -35,18 +37,19 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 
 The project includes a test suite run using PHPUnit. The tests verify that the PDO connection is established successfully and that the database exists.
 
+
 ### PHPUnit Test Results
 
 ```bash
-sample_php_code % vendor/bin/phpunit --bootstrap vendor/autoload.php tests
+vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 PHPUnit 11.3.1 by Sebastian Bergmann and contributors.
 
 Runtime:       PHP 8.3.9
-Configuration: /Development/sample_php_code/phpunit.xml
+Configuration: /Users/michaelkingsnorth/Development/sample_php_code/phpunit.xml
 
-.....................                                             21 / 21 (100%)
+........................                                          24 / 24 (100%)
 
-Time: 00:00.416, Memory: 8.00 MB
+Time: 00:00.093, Memory: 8.00 MB
 
-OK (21 tests, 26 assertions)
+OK (24 tests, 30 assertions)
 ````

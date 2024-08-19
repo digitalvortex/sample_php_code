@@ -1,11 +1,28 @@
 <?php
 declare(strict_types=1);
-
 require __DIR__ . '/vendor/autoload.php';
 
 use App\Config\LoadEnv;
+use App\Core\Container;
+use App\Definitions\DatabaseDefinitions;
+use App\Service\EncryptionService;
 
-LoadEnv::load('.env');
-die($_ENV['DB_HOST']);
+$env = __DIR__ . '/.env';
+if (!file_exists($env)) {
+    die("Environment file not found.");
+}
 
+LoadEnv::load($env);
 
+$container = new Container();
+
+// Register services from DatabaseDefinitions
+foreach (DatabaseDefinitions::getDefinitions() as $name => $definition) {
+    $container->register($name, $definition, true);
+}
+
+$container->register(EncryptionService::class, function (Container $c) {
+    return new EncryptionService();
+}, true);
+
+return $container;

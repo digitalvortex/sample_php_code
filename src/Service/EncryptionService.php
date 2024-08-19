@@ -10,7 +10,7 @@ namespace App\Service;
  *
  * @package App\Services
  */
-class Encryption
+class EncryptionService
 {
     /**
      * @var string The encryption key.
