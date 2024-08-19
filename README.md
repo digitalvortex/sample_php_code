@@ -45,7 +45,7 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 PHPUnit 11.3.1 by Sebastian Bergmann and contributors.
 
 Runtime:       PHP 8.3.9
-Configuration: /Users/michaelkingsnorth/Development/sample_php_code/phpunit.xml
+Configuration: /Development/sample_php_code/phpunit.xml
 
 ........................                                          24 / 24 (100%)
 
