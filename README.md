@@ -13,6 +13,10 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **SetKey Utility**: A utility script for generating a sodium key for the user to manually save to the `.env` file.
 - **Interfaces**: Interfaces are being added to enforce standard methods and promote consistency across the codebase.
 
+## Warning
+
+**Any pull requests that contain Composer third-party libraries will be rejected.** The aim of this project is to use raw PHP to create this framework, avoiding external dependencies to focus on understanding the core functionalities of PHP and MVC architecture.
+
 ## Progress
 
 ### Implemented Components
@@ -32,6 +36,8 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Controllers**: Implement controllers to handle requests and manage application flow.
 - **Routing**: Build a custom router to map URLs to controllers and actions.
 - **Expand Test Coverage**: Write additional tests to cover new components as they are implemented.
+
+
 
 ## Testing Results
 
