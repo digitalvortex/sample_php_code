@@ -5,7 +5,7 @@ namespace Tests\Migrations;
 
 use App\Config\LoadEnv;
 use App\Migrations\UserMigration;
-use App\Service\DatabaseService;
+use App\Services\DatabaseService;
 use PDO;
 use PHPUnit\Framework\TestCase;
 

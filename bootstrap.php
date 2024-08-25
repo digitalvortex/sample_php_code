@@ -5,7 +5,8 @@ require __DIR__ . '/vendor/autoload.php';
 use App\Config\LoadEnv;
 use App\Core\Container;
 use App\Definitions\DatabaseDefinitions;
-use App\Service\EncryptionService;
+use App\Models\User;
+use App\Services\EncryptionService;
 
 $env = __DIR__ . '/.env';
 if (!file_exists($env)) {
@@ -23,6 +24,11 @@ foreach (DatabaseDefinitions::getDefinitions() as $name => $definition) {
 
 $container->register(EncryptionService::class, function (Container $c) {
     return new EncryptionService();
+}, true);
+
+// let's add the UserModel to the container
+$container->register(User::class, function (Container $c) {
+    return new User($c->get(PDO::class), $c->get(EncryptionService::class));
 }, true);
 
 return $container;

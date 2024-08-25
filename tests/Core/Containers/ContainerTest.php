@@ -3,7 +3,7 @@ declare(strict_types=1);
 
 use PHPUnit\Framework\TestCase;
 use App\Core\Container;
-use App\Service\EncryptionService;
+use App\Services\EncryptionService;
 
 class ContainerTest extends TestCase
 {

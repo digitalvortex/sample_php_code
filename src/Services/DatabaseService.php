@@ -1,6 +1,6 @@
 <?php
 declare(strict_types=1);
-namespace App\Service;
+namespace App\Services;
 
 use PDO;
 
@@ -9,7 +9,7 @@ use PDO;
  *
  * This service handles the database connection using PDO.
  *
- * @package App\Service
+ * @package App\Services
  */
 class DatabaseService
 {

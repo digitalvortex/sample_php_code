@@ -1,10 +1,10 @@
 <?php
 declare(strict_types=1);
 
-namespace Tests\Service;
+namespace Tests\Services;
 
 use App\Config\LoadEnv;
-use App\Service\DatabaseService;
+use App\Services\DatabaseService;
 use Attribute;
 use PHPUnit\Framework\TestCase;
 

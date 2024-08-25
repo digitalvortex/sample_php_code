@@ -7,8 +7,8 @@ $container = require __DIR__ . '/../bootstrap.php';
 
 try {
     // Retrieve the DatabaseService from the container
-    $databaseService = $container->resolve(App\Service\DatabaseService::class);
-    $encryptionService = $container->resolve(App\Service\EncryptionService::class);
+    $databaseService = $container->resolve(App\Services\DatabaseService::class);
+    $encryptionService = $container->resolve(App\Services\EncryptionService::class);
 
     // Get the PDO connection from the DatabaseService
     $pdo = $databaseService->getConnection();

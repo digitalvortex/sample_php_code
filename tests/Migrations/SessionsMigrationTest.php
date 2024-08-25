@@ -2,7 +2,7 @@
 namespace Tests\Migrations;
 
 use App\Config\LoadEnv;
-use App\Service\DatabaseService;
+use App\Services\DatabaseService;
 use App\Migrations\SessionsMigration;
 use PDO;
 use PHPUnit\Framework\TestCase;
