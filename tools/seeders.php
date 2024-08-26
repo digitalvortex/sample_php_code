@@ -1,20 +1,19 @@
 <?php
 declare(strict_types=1);
 
-require __DIR__ . '/bootstrap.php';
-
 use App\Seeders\UserSeeder;
-use Exception;
+use App\Models\User;
 
 /** @var \App\Core\Container $container */
-$container = require __DIR__ . '/bootstrap.php';
+$container = require __DIR__ . '/../bootstrap.php'; // Adjust the path as needed
+$userModel = $container->get(User::class);
 
-/** @var UserSeeder $userSeeder */
-$userSeeder = $container->get(UserSeeder::class);
+$seeders = [
+    new UserSeeder($userModel),
+];
 
-try {
-    $userSeeder->seed();
-    echo "User seeding completed successfully.";
-} catch (Exception $e) {
-    echo "Error during user seeding: " . $e->getMessage();
+foreach ($seeders as $seeder) {
+    echo "Running seeder: " . get_class($seeder) . "\n";
+    $seeder->seed();
+    echo "Seeder completed: " . get_class($seeder) . "\n";
 }

@@ -36,11 +36,13 @@ class UserMigration
      */
     public function up(): void
     {
-        $this->pdo->exec('CREATE TABLE users (
+        $this->pdo->exec('CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            name TEXT NOT NULL,
+            username TEXT NOT NULL,
             email TEXT NOT NULL,
             password TEXT NOT NULL,
+            first_name TEXT NOT NULL,
+            last_name TEXT NOT NULL,
             level INT NOT NULL DEFAULT 1,
             recovery_token TEXT NULL,
             recovery_token_created_at TIMESTAMP NULL,

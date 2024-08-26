@@ -21,6 +21,11 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 
 **Any pull requests that contain Composer third-party libraries will be rejected.** The aim of this project is to use raw PHP to create this framework, avoiding external dependencies to focus on understanding the core functionalities of PHP and MVC architecture.
 
+## Disclaimer
+
+**This code is currently not production ready. We are not responsible for any loss or breach incurred by using this sample code in a production environment. Always take extreme caution when dealing with real data in a production environment.**
+
+
 ## Progress
 
 ### Implemented Components
@@ -82,11 +87,11 @@ vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 PHPUnit 11.3.1 by Sebastian Bergmann and contributors.
 
 Runtime:       PHP 8.3.9
-Configuration: /Development/sample_php_code/phpunit.xml
+Configuration: Development/sample_php_code/phpunit.xml
 
-........................                                          24 / 24 (100%)
+................................                                  32 / 32 (100%)
 
-Time: 00:00.093, Memory: 8.00 MB
+Time: 00:00.835, Memory: 8.00 MB
 
-OK (24 tests, 30 assertions)
+OK (32 tests, 64 assertions)
 ````

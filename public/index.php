@@ -5,22 +5,24 @@ use PHPUnit\Event\Runtime\PHP;
 
 $container = require __DIR__ . '/../bootstrap.php';
 
-try {
-    // Retrieve the DatabaseService from the container
-    $databaseService = $container->resolve(App\Services\DatabaseService::class);
-    $encryptionService = $container->resolve(App\Services\EncryptionService::class);
+$pdo = $container->get(PDO::class);
+$encryptionService = $container->get(App\Services\EncryptionService::class);
 
-    // Get the PDO connection from the DatabaseService
-    $pdo = $databaseService->getConnection();
+echo "<h1>Notice</h1>";
+echo "<b>Note:</b> The data used in this example is synthetic, it's test data!" . PHP_EOL;
+echo "<br />";
+echo "Always keep real PII data safe from attackers!";
 
-    // Use the PDO connection to perform a query
-    $stmt = $pdo->query('SELECT DATABASE()');
-    $databaseName = $stmt->fetchColumn();
+$user = new App\Models\User($pdo, $encryptionService);
+$userData = $user->find(1);
 
-    echo "Connection test database established <br />";
-} catch (Exception $e) {
-    echo "Error: " . $e->getMessage();
-}
+$truncatedUsername = substr($userData['username'], 0, 3) . '*******';
+$userData['username'] = $truncatedUsername;
+
+$userData['password'] = 'Password overridden!';
+echo '<pre>' . print_r($userData, true) . '</pre>';
+
+
 
 $clearText = 'Hello, World!';
 $encryptedText = $encryptionService->encrypt($clearText);
