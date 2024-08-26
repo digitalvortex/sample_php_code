@@ -45,6 +45,8 @@ class UserMigration
             recovery_token TEXT NULL,
             recovery_token_created_at TIMESTAMP NULL,
             recovery_expires_at TIMESTAMP NULL,
+            reset_at TIMESTAMP NULL,
+            deleted_at TIMESTAMP NULL,
             created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
         )');
     }

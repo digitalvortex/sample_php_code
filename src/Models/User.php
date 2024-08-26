@@ -40,7 +40,12 @@ class User
                 VALUES (:username, :email, :password, :first_name, :last_name, :created_at)';
         $stmt = $this->pdo->prepare($sql);
 
-        // Encrypt sensitive data
+        /**
+         * Encrypt sensitive data
+         * - Only if it's being inserted
+         * @param array $data
+         * @return array $data
+         */
         $data['email'] = $this->encryptionService->encrypt($data['email']);
         $data['first_name'] = $this->encryptionService->encrypt($data['first_name']);
         $data['last_name'] = $this->encryptionService->encrypt($data['last_name']);
@@ -96,7 +101,9 @@ class User
                 WHERE id = :id';
         $stmt = $this->pdo->prepare($sql);
 
-        // Encrypt sensitive data if provided
+        /** Encrypt sensitive data
+         * - Only if it's being updated
+         */
         if (isset($data['email'])) {
             $data['email'] = $this->encryptionService->encrypt($data['email']);
         }
@@ -116,6 +123,32 @@ class User
             ':last_name' => $data['last_name'] ?? $currentUser['last_name'],
             ':updated_at' => date('Y-m-d H:i:s'),
         ]);
+    }
+
+    /**
+     * Find all deleted users.
+     * 
+     * @return array Returns an array of deleted users.
+     */
+    public function findDeleted(): array
+    {
+        $sql = 'SELECT * FROM users WHERE deleted_at IS NOT NULL';
+        $stmt = $this->pdo->prepare($sql);
+        $stmt->execute();
+        return $stmt->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /**
+     * Soft delete a user by ID.
+     * 
+     * @param int $id The ID of the user to soft delete.
+     * @return bool Returns true on success, false on failure.
+     */
+    public function softDelete(int $id): bool
+    {
+        $sql = 'UPDATE users SET deleted_at = :deleted_at WHERE id = :id';
+        $stmt = $this->pdo->prepare($sql);
+        return $stmt->execute([':id' => $id, ':deleted_at' => date('Y-m-d H:i:s')]);
     }
 
     /**

@@ -12,6 +12,10 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Encryption Service**: A service that provides encryption and decryption functionalities using the sodium library.
 - **SetKey Utility**: A utility script for generating a sodium key for the user to manually save to the `.env` file.
 - **Interfaces**: Interfaces are being added to enforce standard methods and promote consistency across the codebase.
+- **Migration Example**: A `UserMigration` class that handles the creation and deletion of the users table in the database.
+- **Seeder Example**: A `UserSeeder` class that uses the `User` model to import test data into the database.
+- **Secure Password Generator**: A trait to generate secure passwords for the seeders.
+- **Tools**: `seeders.php` and `migrations.php` scripts under the `tools` directory to run seeders and migrations.
 
 ## Warning
 
@@ -26,8 +30,11 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Unit Tests**: PHPUnit tests have been written to verify the functionality of the `DatabaseService`, including checking the PDO connection and database existence.
 - **Encryption Service**: A service that provides encryption and decryption functionalities using the sodium library.
 - **SetKey Utility**: A utility script for generating a sodium key for the user to manually save to the `.env` file.
-- **Custom DI Container**: A basic dependency injection container that registers and resolves services.
-- **Interfaces**: Added interfaces such as `MigrationInterface` and `DatabaseDefinitionsInterface` to enforce standard methods.
+- **Migration Example**: A `UserMigration` class that handles the creation and deletion of the users table in the database.
+- **Seeder Example**: A `UserSeeder` class that uses the `User` model to import test data into the database.
+- **Secure Password Generator**: A trait to generate secure passwords for the seeders.
+- **Tools**: `seeders.php` and `migrations.php` scripts under the `tools` directory to run seeders and migrations.
+
 
 ### Next Steps
 
@@ -37,7 +44,31 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Routing**: Build a custom router to map URLs to controllers and actions.
 - **Expand Test Coverage**: Write additional tests to cover new components as they are implemented.
 
+## Running Migrations
 
+To run the database migrations, execute the <span style="color:blue; font-weight:bold;">tools/migrations.php</span> script:
+
+````sh
+php tools/migrations.php
+````
+
+This will create the necessary tables in the database as defined in the migrations classes.
+
+## Seeding the Database
+
+To see the database with test data, run the <span style="color:blue; font-weight:bold;">tools/seeders.php</span> script:
+
+````
+php tools/seeders.php
+````
+
+This will insert test users into the database using the User model, which handles password hashing and encryption. 
+
+Note: Ensure that the migrations have been run before seeding the database. If the migrations have not been run, you will receieve an error message indicating the migrations need to be run first. 
+
+## Security Note
+
+The <span style="color:blue; font-weight:bold;">tools</span> directory contains scripts that should not be accessible to anyone on the Internet. Ensure that this directory is protected and not exposed to the public. You can achive this by configuring your web server to deny access to the tools directory. 
 
 ## Testing Results
 

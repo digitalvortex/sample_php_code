@@ -6,6 +6,7 @@ use App\Config\LoadEnv;
 use App\Core\Container;
 use App\Definitions\DatabaseDefinitions;
 use App\Models\User;
+use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
 
 $env = __DIR__ . '/.env';
@@ -29,6 +30,10 @@ $container->register(EncryptionService::class, function (Container $c) {
 // let's add the UserModel to the container
 $container->register(User::class, function (Container $c) {
     return new User($c->get(PDO::class), $c->get(EncryptionService::class));
+}, true);
+
+$container->register(UserSeeder::class, function (Container $c) {
+    return new UserSeeder($c->get(PDO::class), $c->get(EncryptionService::class));      
 }, true);
 
 return $container;
