@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 require __DIR__ . '/vendor/autoload.php';
 
 use App\Config\LoadEnv;
 use App\Core\Container;
 use App\Definitions\DatabaseDefinitions;
+use App\Definitions\RoutingDefinitions;
 use App\Models\User;
 use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
@@ -33,7 +35,11 @@ $container->register(User::class, function (Container $c) {
 }, true);
 
 $container->register(UserSeeder::class, function (Container $c) {
-    return new UserSeeder($c->get(PDO::class), $c->get(EncryptionService::class));      
+    return new UserSeeder($c->get(PDO::class), $c->get(EncryptionService::class));
 }, true);
+
+foreach (RoutingDefinitions::getDefinitions() as $name => $definition) {
+    $container->register($name, $definition, true);
+}
 
 return $container;
