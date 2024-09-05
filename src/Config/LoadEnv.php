@@ -7,7 +7,7 @@ namespace App\Config;
  * 
  * This class is responsible for loading environment variables from a file.
  */
-class LoadEnv
+readonly class LoadEnv
 {
     /**
      * Loads environment variables from the specified file.

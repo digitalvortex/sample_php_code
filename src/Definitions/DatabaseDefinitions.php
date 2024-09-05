@@ -14,7 +14,7 @@ use PDO;
  *
  * @package App\Definitions
  */
-class DatabaseDefinitions implements DatabaseDefinitionsInterface
+readonly class DatabaseDefinitions implements DatabaseDefinitionsInterface
 {
     /**
      * Returns an array of database connection definitions.
