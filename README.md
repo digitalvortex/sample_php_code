@@ -25,7 +25,6 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 
 **This code is currently not production ready. We are not responsible for any loss or breach incurred by using this sample code in a production environment. Always take extreme caution when dealing with real data in a production environment.**
 
-
 ## Progress
 
 ### Implemented Components
@@ -40,7 +39,6 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Secure Password Generator**: A trait to generate secure passwords for the seeders.
 - **Tools**: `seeders.php` and `migrations.php` scripts under the `tools` directory to run seeders and migrations.
 
-
 ### Next Steps
 
 - **Models**: Implement models to interact with the database.
@@ -53,9 +51,9 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 
 To run the database migrations, execute the <span style="color:blue; font-weight:bold;">tools/migrations.php</span> script:
 
-````sh
+```sh
 php tools/migrations.php
-````
+```
 
 This will create the necessary tables in the database as defined in the migrations classes.
 
@@ -63,22 +61,21 @@ This will create the necessary tables in the database as defined in the migratio
 
 To see the database with test data, run the <span style="color:blue; font-weight:bold;">tools/seeders.php</span> script:
 
-````
+```
 php tools/seeders.php
-````
+```
 
-This will insert test users into the database using the User model, which handles password hashing and encryption. 
+This will insert test users into the database using the User model, which handles password hashing and encryption.
 
-Note: Ensure that the migrations have been run before seeding the database. If the migrations have not been run, you will receieve an error message indicating the migrations need to be run first. 
+Note: Ensure that the migrations have been run before seeding the database. If the migrations have not been run, you will receieve an error message indicating the migrations need to be run first.
 
 ## Security Note
 
-The <span style="color:blue; font-weight:bold;">tools</span> directory contains scripts that should not be accessible to anyone on the Internet. Ensure that this directory is protected and not exposed to the public. You can achive this by configuring your web server to deny access to the tools directory. 
+The <span style="color:blue; font-weight:bold;">tools</span> directory contains scripts that should not be accessible to anyone on the Internet. Ensure that this directory is protected and not exposed to the public. You can achive this by configuring your web server to deny access to the tools directory.
 
 ## Testing Results
 
 The project includes a test suite run using PHPUnit. The tests verify that the PDO connection is established successfully and that the database exists.
-
 
 ### PHPUnit Test Results
 
@@ -94,4 +91,4 @@ Configuration: Development/sample_php_code/phpunit.xml
 Time: 00:00.835, Memory: 8.00 MB
 
 OK (32 tests, 64 assertions)
-````
+```
