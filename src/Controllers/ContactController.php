@@ -45,8 +45,8 @@ class ContactController implements FormControllerInterface
 
         $this->validationResponse->validate($data);
         if ($this->validationResponse->hasErrors()) {
-            echo 'Bang!';
-            die();
+            //echo 'Bang!';
+            //die();
         }
 
         if (!$this->validationResponse->hasErrors()) {

@@ -38,14 +38,32 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Seeder Example**: A `UserSeeder` class that uses the `User` model to import test data into the database.
 - **Secure Password Generator**: A trait to generate secure passwords for the seeders.
 - **Tools**: `seeders.php` and `migrations.php` scripts under the `tools` directory to run seeders and migrations.
+- **Validation**: A `ValidationResponse` class that handles validation responses and errors.
+- **Contact Form**: A `ContactController` class that handles the contact form submission and validation.
+- **Services**: A `ServicesController` class that handles the services page.
+- **About**: A `AboutController` class that handles the about page.
+- **Blog**: A `BlogController` class that handles the blog page.
+- **View**: A `View` class that handles rendering views.
+- **Router**: A `Router` class that handles routing requests to the appropriate controller and action.
 
 ### Next Steps
 
-- **Models**: Implement models to interact with the database.
-- **Views**: Create basic views to render HTML output.
-- **Controllers**: Implement controllers to handle requests and manage application flow.
-- **Routing**: Build a custom router to map URLs to controllers and actions.
+- **ContactFormValidation**: Need to fix and complete the form validation.
+- **Views**: Create basic views to render HTML output and layouts using the `View` class and files.
 - **Expand Test Coverage**: Write additional tests to cover new components as they are implemented.
+- **Contact form**: Complete submit, validation and procecssing
+- **Blog**: Add blog functionality to the site
+- **Add rate**: limiting to the site
+- **Add blog models**: Add models for the blogging functionality.
+- **Add a basic shop**: Add a basic shop to the site.
+- **Implement middleware**: Add middleware examles to the site.
+- **Add authentication**: Add authentication to the site.
+- **Add authorization**: Add authorization to the site.
+- **Add a basic admin**: Add a basic admin to the site.
+- **Add GeoIP**: Add GeoIP to the site.
+- **Add a basic newsletter**: Add a basic newsletter to the site.
+- **Add concurrency or something similar**: Add concurrency or something similar to the site.
+- **More to come**: More to come...
 
 ## Running Migrations
 
