@@ -1,8 +1,3 @@
-<?php
-$title = 'Contact Us';
-$metaDescription = 'Get in touch with us for any inquiries or feedback.';
-?>
-
 <h1><?= $title ?></h1>
 <?= $content ?>
 <form method="post" action="/contact/submit">

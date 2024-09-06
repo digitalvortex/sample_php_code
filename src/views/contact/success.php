@@ -1,7 +1,3 @@
-<?php
-// The $title and $content variables are passed from the controller
-?>
-
 <h1><?= $title ?></h1>
 <p><?= $content ?></p>
 

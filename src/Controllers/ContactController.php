@@ -15,6 +15,13 @@ use App\Interfaces\FormControllerInterface;
  */
 class ContactController implements FormControllerInterface
 {
+    private ValidationResponse $validationResponse;
+
+    public function __construct()
+    {
+        $this->validationResponse = new ValidationResponse();
+    }
+
     /**
      * Show the "Contact" page.
      *
@@ -30,27 +37,19 @@ class ContactController implements FormControllerInterface
 
     public function submit(): string
     {
-        $errors = [];
-        $name = $_POST['name'] ?? '';
-        $email = $_POST['email'] ?? '';
-        $message = $_POST['message'] ?? '';
+        $data = [
+            'name' => $_POST['name'] ?? '',
+            'email' => $_POST['email'] ?? '',
+            'message' => $_POST['message'] ?? '',
+        ];
 
-        // Validate name
-        if (empty($name)) {
-            $errors['name'] = 'Name is required';
+        $this->validationResponse->validate($data);
+        if ($this->validationResponse->hasErrors()) {
+            echo 'Bang!';
+            die();
         }
 
-        // Validate email
-        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $errors['email'] = 'Valid email is required';
-        }
-
-        // Validate message
-        if (empty($message)) {
-            $errors['message'] = 'Message is required';
-        }
-
-        if (empty($errors)) {
+        if (!$this->validationResponse->hasErrors()) {
             // Process the form
             // For example: send email, save to database, etc.
             return View::render('contact/success', [
@@ -62,7 +61,7 @@ class ContactController implements FormControllerInterface
             return View::render('contact/show', [
                 'title' => 'Contact Us',
                 'content' => 'This is the contact page content.',
-                'errors' => $errors
+                'errors' => $this->validationResponse->getErrors()
             ]);
         }
     }

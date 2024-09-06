@@ -21,15 +21,20 @@ class View
     {
         // Pass $content and $params separately to the layout
         ob_start();
-        require __DIR__ . '/../Views/layouts/main.php';
+        require __DIR__ . '/../views/layouts/main.php';
         return ob_get_clean();
     }
 
-    protected static function renderOnlyView($view, $data)
+    protected static function renderOnlyView(string $view, array $params): string
     {
+        $viewPath = __DIR__ . '/../views/' . $view . '.php';
+        if (!file_exists($viewPath)) {
+            throw new \Exception("View file not found: $viewPath");
+        }
+
         ob_start();
-        extract($data);
-        require __DIR__ . "/../Views/$view.php";
+        extract($params);
+        require $viewPath;
         return ob_get_clean();
     }
 }

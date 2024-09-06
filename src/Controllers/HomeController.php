@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Controller;
+use App\Interfaces\ControllerInterface;
 use App\Core\View;
 
 /**
@@ -12,7 +12,7 @@ use App\Core\View;
  * 
  * Handles requests for the home page.
  */
-class HomeController extends Controller
+class HomeController implements ControllerInterface
 {
     /**
      * Display the home page.
@@ -24,19 +24,6 @@ class HomeController extends Controller
         return View::render('home/index', [
             'title' => 'Welcome to Our Modern Website',
             'metaDescription' => 'Discover amazing features and services on our innovative platform.'
-        ]);
-    }
-
-    /**
-     * Display the about page.
-     *
-     * @return string The rendered about page
-     */
-    public function about(): string
-    {
-        return View::render('about/show', [
-            'title' => 'About Us',
-            'metaDescription' => 'Learn more about our company and our mission.'
         ]);
     }
 }

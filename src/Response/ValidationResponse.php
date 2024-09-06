@@ -8,27 +8,27 @@ class ValidationResponse
 {
     private array $errors = [];
 
-    public function validate(array $rules): bool
+    public function validate(array $data): void
     {
-        foreach ($rules as $field => $rule) {
-            $value = filter_input(INPUT_POST, $field, FILTER_SANITIZE_SPECIAL_CHARS);
-            if (!$this->validateField($value, $rule)) {
-                $this->errors[$field] = "Invalid $field";
-            }
+        // Validate name
+        if (empty($data['name'])) {
+            $this->errors['name'] = 'Name is required';
         }
-        return empty($this->errors);
+
+        // Validate email
+        if (empty($data['email']) || !filter_var($data['email'], FILTER_VALIDATE_EMAIL)) {
+            $this->errors['email'] = 'Valid email is required';
+        }
+
+        // Validate message
+        if (empty($data['message'])) {
+            $this->errors['message'] = 'Message is required';
+        }
     }
 
-    private function validateField($value, $rule): bool
+    public function hasErrors(): bool
     {
-        if ($rule === 'required' && empty($value)) {
-            return false;
-        }
-        if (strpos($rule, 'regex:') === 0) {
-            $pattern = substr($rule, 6);
-            return preg_match($pattern, $value) === 1;
-        }
-        return true;
+        return !empty($this->errors);
     }
 
     public function getErrors(): array

@@ -23,7 +23,7 @@ class ErrorController implements ErrorControllerInterface
     {
         $title = '404 Not Found';
         $content = 'The page you are looking for could not be found.';
-        return View::render('error/404', compact('title', 'content'));
+        return View::render('errors/404', compact('title', 'content'));
     }
 
     /**
@@ -35,13 +35,13 @@ class ErrorController implements ErrorControllerInterface
     {
         $title = '500 Internal Server Error';
         $content = 'An unexpected error occurred. Please try again later.';
-        return View::render('error/500', compact('title', 'content'));
+        return View::render('errors/500', compact('title', 'content'));
     }
 
     public function internalServerError(): string
     {
         $title = '500 Internal Server Error';
         $content = 'An unexpected error occurred. Please try again later.';
-        return View::render('error/500', compact('title', 'content'));
+        return View::render('errors/500', compact('title', 'content'));
     }
 }
