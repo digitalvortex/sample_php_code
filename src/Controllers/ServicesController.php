@@ -21,9 +21,17 @@ class ServicesController implements ControllerInterface
      */
     public function show(): string
     {
+        $services = [
+            'Web Development',
+            'Mobile App Development',
+            'UI/UX Design',
+            'Cloud Solutions',
+            'Cybersecurity'
+        ];
+
         return View::render('services/show', [
             'title' => 'Our Services',
-            'metaDescription' => 'Explore our range of professional services.'
+            'content' => $services
         ]);
     }
 }
