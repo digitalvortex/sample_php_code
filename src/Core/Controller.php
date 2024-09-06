@@ -4,28 +4,29 @@ declare(strict_types=1);
 
 namespace App\Core;
 
-class Controller
+/**
+ * Base Controller class
+ */
+abstract class Controller
 {
-    protected function render($view, $data = [])
+    /**
+     * Render a view
+     *
+     * @param string $view The view file to render
+     * @param array $data The data to pass to the view
+     * @return string The rendered content
+     */
+    protected function render(string $view, array $data = []): string
     {
-        $viewContent = $this->renderView($view, $data);
-        $layoutContent = $this->renderLayout($data);
-        return str_replace('{{content}}', $viewContent, $layoutContent);
-    }
+        $viewPath = __DIR__ . '/../Views/' . $view . '.php';
 
-    protected function renderView($view, $data)
-    {
+        if (!file_exists($viewPath)) {
+            throw new \RuntimeException("View file not found: $viewPath");
+        }
+
         ob_start();
         extract($data);
-        include __DIR__ . "/../Views/{$view}.php";
-        return ob_get_clean();
-    }
-
-    protected function renderLayout($data)
-    {
-        ob_start();
-        extract($data);
-        include __DIR__ . '/../Views/layouts/main.php';
+        include $viewPath;
         return ob_get_clean();
     }
 }

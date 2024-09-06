@@ -6,22 +6,21 @@ namespace App\Core;
 
 class View
 {
-    public static function render(string $view, array $data = []): string
+    public static function render(string $view, array $params = []): string
     {
-        $viewContent = self::renderOnlyView($view, $data);
-        return self::renderContent($viewContent, $data);
+        $content = self::renderContent($view, $params);
+        return self::layoutContent($content, $params);
     }
 
-    protected static function renderContent($viewContent, $data)
+    protected static function renderContent(string $view, array $params): string
     {
-        $layoutContent = self::layoutContent($data);
-        return str_replace('{{content}}', $viewContent, $layoutContent);
+        return self::renderOnlyView($view, $params);
     }
 
-    protected static function layoutContent($data)
+    protected static function layoutContent(string $content, array $params): string
     {
+        // Pass $content and $params separately to the layout
         ob_start();
-        extract($data);
         require __DIR__ . '/../Views/layouts/main.php';
         return ob_get_clean();
     }

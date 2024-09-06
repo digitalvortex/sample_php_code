@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-use App\Core\Controller;
+use App\Core\View;
+use App\Interfaces\ControllerInterface;
 
 /**
  * Class AboutController
  *
  * Handles requests related to the "About" page.
  */
-class AboutController extends Controller
+class AboutController implements ControllerInterface
 {
     /**
      * Show the "About" page.
@@ -20,8 +21,9 @@ class AboutController extends Controller
      */
     public function show(): string
     {
-        return $this->render('about/show', [
-            'title' => 'About Us'
+        return View::render('about/show', [
+            'title' => 'About Us',
+            'metaDescription' => 'Learn more about our company and our mission.'
         ]);
     }
 }

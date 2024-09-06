@@ -10,6 +10,7 @@ use App\Definitions\RoutingDefinitions;
 use App\Models\User;
 use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
+use App\Response\ValidationResponse;
 
 $env = __DIR__ . '/.env';
 if (!file_exists($env)) {
@@ -41,5 +42,9 @@ $container->register(UserSeeder::class, function (Container $c) {
 foreach (RoutingDefinitions::getDefinitions() as $name => $definition) {
     $container->register($name, $definition, true);
 }
+
+$container->register(ValidationResponse::class, function (Container $c) {
+    return new ValidationResponse();
+}, true);
 
 return $container;
