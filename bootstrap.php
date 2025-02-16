@@ -7,10 +7,11 @@ use App\Config\LoadEnv;
 use App\Core\Container;
 use App\Definitions\DatabaseDefinitions;
 use App\Definitions\RoutingDefinitions;
-use App\Models\User;
+use App\Definitions\ModelsDefinitions;
 use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
 use App\Response\ValidationResponse;
+use PDO;
 
 $env = __DIR__ . '/.env';
 if (!file_exists($env)) {
@@ -30,14 +31,11 @@ $container->register(EncryptionService::class, function (Container $c) {
     return new EncryptionService();
 }, true);
 
-// let's add the UserModel to the container
-$container->register(User::class, function (Container $c) {
-    return new User($c->get(PDO::class), $c->get(EncryptionService::class));
-}, true);
-
-$container->register(UserSeeder::class, function (Container $c) {
-    return new UserSeeder($c->get(PDO::class), $c->get(EncryptionService::class));
-}, true);
+// Register all models from ModelsDefinitions
+use App\Definitions\ModelsDefinitions as MD;
+foreach (MD::getDefinitions() as $model => $factory) {
+    $container->register($model, $factory, true);
+}
 
 foreach (RoutingDefinitions::getDefinitions() as $name => $definition) {
     $container->register($name, $definition, true);
