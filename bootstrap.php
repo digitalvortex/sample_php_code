@@ -11,7 +11,6 @@ use App\Definitions\ModelsDefinitions;
 use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
 use App\Response\ValidationResponse;
-use PDO;
 
 $env = __DIR__ . '/.env';
 if (!file_exists($env)) {
