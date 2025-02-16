@@ -37,13 +37,24 @@ class SessionsMigration implements MigrationInterface
      */
     public function up(): void
     {
-        $this->pdo->exec('CREATE TABLE sessions (
-            session_id INT AUTO_INCREMENT PRIMARY KEY,
-            user_id INT NOT NULL,
-            session_key TEXT NOT NULL,
-            value TEXT NOT NULL,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-        )');
+        $sql = <<<SQL
+        CREATE TABLE sessions (
+            id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+            session_id VARCHAR(255) NOT NULL,
+            user_id BIGINT UNSIGNED NULL,
+            ip_address VARCHAR(45) NOT NULL,
+            user_agent TEXT NULL,
+            payload TEXT NULL,
+            last_activity TIMESTAMP NOT NULL,
+            created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+            updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+            UNIQUE KEY sessions_session_id_unique (session_id),
+            KEY sessions_user_id_index (user_id),
+            KEY sessions_last_activity_index (last_activity)
+        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        SQL;
+
+        $this->pdo->exec($sql);
     }
 
     /**
@@ -53,6 +64,6 @@ class SessionsMigration implements MigrationInterface
      */
     public function down(): void
     {
-        $this->pdo->exec('DROP TABLE sessions');
+        $this->pdo->exec('DROP TABLE IF EXISTS sessions');
     }
 }

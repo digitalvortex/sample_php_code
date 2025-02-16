@@ -8,7 +8,7 @@ namespace App\Models;
  * 
  * Model representing the user entity. Handles CRUD operations with the database.
  */
-class User extends BaseModel
+class User extends Base
 {
     protected string $table = 'users';
     
@@ -30,47 +30,101 @@ class User extends BaseModel
     ];
 
     /**
+     * Create a new user with password hashing
+     *
+     * @param array $userData The user data to create
+     * @return bool Returns true on success, false on failure
+     */
+    public function createUser(array $userData): bool
+    {
+        // Validate required fields
+        $requiredFields = ['username', 'email', 'password'];
+        foreach ($requiredFields as $field) {
+            if (!isset($userData[$field]) || empty($userData[$field])) {
+                return false;
+            }
+        }
+
+        // Hash password before creation if it exists
+        if (isset($userData['password'])) {
+            $userData['password'] = password_hash($userData['password'], PASSWORD_ARGON2ID);
+        }
+
+        // Add creation timestamp
+        $userData['created_at'] = date('Y-m-d H:i:s');
+        
+        return $this->create($userData);
+    }
+
+    /**
      * Update an existing user.
      * 
      * @param int $id The ID of the user to update.
      * @param array $data The user data to update.
      * @return bool Returns true on success, false on failure.
      */
-    public function update(int $id, array $data): bool
+    public function updateUser(int $id, array $data): bool
     {
+        // First check if user exists
         $currentUser = $this->find($id);
+        if (!$currentUser) {
+            return false;
+        }
+    
+        // Now we can safely get the current password
         $currentPassword = $currentUser['password'];
-
+    
         // Handle password separately
         if (isset($data['password'])) {
-            $data['password'] = password_hash($data['password'], PASSWORD_BCRYPT);
+            $data['password'] = password_hash($data['password'], PASSWORD_ARGON2ID);
         } else {
             $data['password'] = $currentPassword;
         }
-
+    
         // Encrypt sensitive fields if they exist in update data
         foreach ($this->encrypted as $field) {
             if (isset($data[$field])) {
                 $data[$field] = $this->encryptionService->encrypt($data[$field]);
             }
         }
-
+    
         $data['updated_at'] = date('Y-m-d H:i:s');
-
+    
         $setClause = [];
         $params = [':id' => $id];
-
+    
         foreach ($this->fillable as $field) {
             if (isset($data[$field])) {
                 $setClause[] = "$field = :$field";
                 $params[":$field"] = $data[$field];
             }
         }
-
+    
         $sql = "UPDATE {$this->table} SET " . implode(', ', $setClause) . " WHERE id = :id";
         $stmt = $this->pdo->prepare($sql);
         
         return $stmt->execute($params);
+    }
+
+    /**
+     * Find a user by their ID
+     *
+     * @param int $id The user ID
+     * @return array|null Returns user data or null if not found
+     */
+    public function findUser(int $id): ?array
+    {
+        return $this->find($id);
+    }
+
+    /**
+     * Get all users from the database
+     *
+     * @return array Returns an array of all users
+     */
+    public function findAllUsers(): array
+    {
+        return $this->findAll();
     }
 
     /**
