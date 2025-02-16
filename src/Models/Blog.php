@@ -3,9 +3,12 @@
 namespace App\Models;
 
 use App\Models;
+use App\Traits\Pagination;
 
 class Blog extends Base
 {
+    use Pagination;
+
     protected string $table = 'blogs';
     
     /**
@@ -61,5 +64,17 @@ class Blog extends Base
     public function deleteBlog(int $id): bool
     {
         return $this->delete($id);
+    }
+
+    /**
+     * Retrieve a paginated list of blog posts.
+     *
+     * @param int $limit Number of records per page.
+     * @param int $offset The offset from where to start retrieving records.
+     * @return array
+     */
+    public function findBlogsPaginated(int $limit, int $offset): array
+    {
+        return $this->paginate($this->table, $limit, $offset);
     }
 }

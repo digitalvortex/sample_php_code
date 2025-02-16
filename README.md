@@ -59,11 +59,15 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
   - Added encryption for sensitive user data
   - Implemented proper validation checks
 - **Improved Testing**:
-  - Updated to PHP 8.4.2 compatibility
-  - Replaced PHPDoc annotations with PHP 8 attributes
+  - Replaced PHPDoc annotations with PHP 8 attributes and TestDox metadata
+  - Added comprehensive CRUD operation tests for models including Blog, User, and more
+  - Introduced pagination tests for blog posts using a dedicated Pagination trait
   - Added comprehensive CRUD operation tests
   - Enhanced mock object parameter matching
   - Added TestDox documentation
+- **Blog Feature Enhancements**:
+  - Implemented Blog list retrieval and pagination functionality via a reusable trait
+  - Updated Blog model to support paginated blog post retrieval
 
 ### Next Steps
 - **Add model events**: Implement model events for actions like before/after save
@@ -122,12 +126,13 @@ The project includes a test suite run using PHPUnit. The tests verify that the P
 vendor/bin/phpunit --bootstrap vendor/autoload.php tests
 PHPUnit 11.3.1 by Sebastian Bergmann and contributors.
 
-Runtime:       PHP 8.3.9
-Configuration: Development/sample_php_code/phpunit.xml
+Runtime:       PHP 8.4.2
+Configuration: /Users/michaelkingsnorth/Development/sample_php_code/phpunit.xml
 
-................................                                  32 / 32 (100%)
+.........................................................         57 / 57 (100%)
 
-Time: 00:00.835, Memory: 8.00 MB
+Time: 00:02.269, Memory: 10.00 MB
 
-OK (32 tests, 64 assertions)
+OK (57 tests, 146 assertions)
+
 ```
