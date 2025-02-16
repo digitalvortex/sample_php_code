@@ -45,9 +45,30 @@ This project is a simple PHP MVC (Model-View-Controller) framework designed to d
 - **Blog**: A `BlogController` class that handles the blog page.
 - **View**: A `View` class that handles rendering views.
 - **Router**: A `Router` class that handles routing requests to the appropriate controller and action.
+- **Base Model**: An abstract base model class that provides core database operations with encryption support.
+- **User Model**: A concrete implementation extending the base model with user-specific functionality.
+- **Unit Tests**: Enhanced PHPUnit tests using PHP 8.4 attributes and comprehensive CRUD testing.
+- **Password Hashing**: Implemented ARGON2ID password hashing for improved security.
+- **Soft Deletes**: Added soft delete functionality for user records.
+
+### Recent Changes
+
+- **Base Model Implementation**: Added a new abstract base model with core database operations.
+- **Enhanced Security**: 
+  - Upgraded password hashing to ARGON2ID
+  - Added encryption for sensitive user data
+  - Implemented proper validation checks
+- **Improved Testing**:
+  - Updated to PHP 8.4.2 compatibility
+  - Replaced PHPDoc annotations with PHP 8 attributes
+  - Added comprehensive CRUD operation tests
+  - Enhanced mock object parameter matching
+  - Added TestDox documentation
 
 ### Next Steps
-
+- **Add model events**: Implement model events for actions like before/after save
+- **Add model observers**: Add observer pattern for model operations
+- **Implement model relationships**: Add support for model relationships
 - **ContactFormValidation**: Need to fix and complete the form validation.
 - **Views**: Create basic views to render HTML output and layouts using the `View` class and files.
 - **Expand Test Coverage**: Write additional tests to cover new components as they are implemented.

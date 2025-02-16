@@ -34,11 +34,11 @@ final class UserTest extends TestCase
     public function testCreateUser(): void
     {
         $userData = [
-            'username' => 'john_doe',
-            'email' => 'john.doe@example.com',
-            'password' => 'securepassword',
+            'username'   => 'john_doe',
+            'email'      => 'john.doe@example.com',
+            'password'   => 'securepassword',
             'first_name' => 'John',
-            'last_name' => 'Doe'
+            'last_name'  => 'Doe'
         ];
 
         $this->encryptionService
@@ -54,8 +54,14 @@ final class UserTest extends TestCase
             ->method('prepare')
             ->willReturn($this->stmt);
 
+        // Add expectation for lastInsertId so that a non-zero value is returned.
+        $this->pdo->expects($this->once())
+            ->method('lastInsertId')
+            ->willReturn('2');
+
         $result = $this->userModel->createUser($userData);
-        $this->assertTrue($result);
+        $this->assertIsInt($result);
+        $this->assertNotSame(0, $result, 'User ID should be non-zero');
     }
 
     #[Test]
@@ -312,18 +318,14 @@ final class UserTest extends TestCase
     #[TestDox('Cannot create user with missing required fields')]
     public function testCreateUserWithMissingFields(): void
     {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Missing required field: email');
+
         $userData = [
             'username' => 'john_doe'
-            // Missing required fields
+            // Missing required fields email and password
         ];
 
-        $this->stmt->expects($this->never())
-            ->method('execute');
-
-        $this->pdo->expects($this->never())
-            ->method('prepare');
-
-        $result = $this->userModel->createUser($userData);
-        $this->assertFalse($result, 'Should return false when required fields are missing');
+        $this->userModel->createUser($userData);
     }
 }

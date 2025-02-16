@@ -28,10 +28,10 @@ abstract class Base
     /**
      * Create a new record
      */
-    protected function create(array $data): bool
+    protected function create(array $data): int
     {
         $fields = array_intersect_key($data, array_flip($this->fillable));
-        
+
         // Encrypt fields that should be encrypted
         foreach ($this->encrypted as $field) {
             if (isset($fields[$field])) {
@@ -41,11 +41,15 @@ abstract class Base
 
         $columns = implode(', ', array_keys($fields));
         $values = implode(', ', array_fill(0, count($fields), '?'));
-        
+
         $sql = "INSERT INTO {$this->table} ($columns) VALUES ($values)";
         $stmt = $this->pdo->prepare($sql);
         
-        return $stmt->execute(array_values($fields));
+        if ($stmt->execute(array_values($fields))) {
+            return (int)$this->pdo->lastInsertId();
+        }
+        
+        throw new \Exception('Unable to insert record');
     }
 
     /**

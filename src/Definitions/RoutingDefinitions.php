@@ -27,7 +27,7 @@ class RoutingDefinitions
                 $router->addRoute('GET', '/', HomeController::class . '@show');
                 $router->addRoute('GET', '/about', AboutController::class . '@show');
                 $router->addRoute('GET', '/contact', ContactController::class . '@show');
-                $router->addRoute('POST', '/contact', ContactController::class . '@submit');
+                $router->addRoute('POST', '/contact/submit', ContactController::class . '@submit');
                 $router->addRoute('GET', '/services', ServicesController::class . '@show');
                 $router->addRoute('GET', '/blog', BlogController::class . '@show');
                 $router->addRoute('GET', '/error/404', ErrorController::class . '@notFound');

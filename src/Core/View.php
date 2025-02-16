@@ -1,40 +1,36 @@
 <?php
-
-declare(strict_types=1);
-
 namespace App\Core;
 
 class View
 {
-    public static function render(string $view, array $params = []): string
+    public static function render(string $template, array $data = []): string
     {
-        $content = self::renderContent($view, $params);
-        return self::layoutContent($content, $params);
-    }
+        // Determine whether to include the layout (default: true)
+        $includeLayout = $data['includeLayout'] ?? true;
+        // Remove the flag so it won’t be extracted into view variables
+        unset($data['includeLayout']);
 
-    protected static function renderContent(string $view, array $params): string
-    {
-        return self::renderOnlyView($view, $params);
-    }
+        // Extract the remaining data so that variables are available in the view.
+        extract($data);
 
-    protected static function layoutContent(string $content, array $params): string
-    {
-        // Pass $content and $params separately to the layout
+        // Render the view (the partial)
         ob_start();
-        require __DIR__ . '/../views/layouts/main.php';
-        return ob_get_clean();
-    }
+        include __DIR__ . '/../views/' . $template . '.php';
+        $content = ob_get_clean();
 
-    protected static function renderOnlyView(string $view, array $params): string
-    {
-        $viewPath = __DIR__ . '/../views/' . $view . '.php';
-        if (!file_exists($viewPath)) {
-            throw new \Exception("View file not found: $viewPath");
+        // If the caller does not want the layout, return the partial's content.
+        if (!$includeLayout) {
+            return $content;
         }
 
+        // Prepare parameters for the layout.
+        // For example, if your layout expects a $params array, you can do:
+        $params = $data;
+        $params['content'] = $content;
+
+        // Render the layout.
         ob_start();
-        extract($params);
-        require $viewPath;
+        include __DIR__ . '/../views/layouts/main.php';
         return ob_get_clean();
     }
 }

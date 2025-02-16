@@ -1,7 +1,5 @@
-<h1><?= $title ?></h1>
-<p><?= $content ?></p>
-
-<!-- You can add more content specific to the success page if needed -->
-<p>We appreciate your interest in contacting us. If you have any further questions, please don't hesitate to reach out.</p>
-
-<a href="/">Return to Home</a>
+<div class="success-message">
+  <h1><?= htmlspecialchars($title ?? 'Message Sent') ?></h1>
+  <p><?= htmlspecialchars($message ?? 'Thank you for your message') ?></p>
+  <a href="/contact" class="button">Back to Contact</a>
+</div>

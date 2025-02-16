@@ -33,15 +33,16 @@ class User extends Base
      * Create a new user with password hashing
      *
      * @param array $userData The user data to create
-     * @return bool Returns true on success, false on failure
+     * @return int Returns the ID of the newly created user
      */
-    public function createUser(array $userData): bool
+    public function createUser(array $userData): int
     {
         // Validate required fields
         $requiredFields = ['username', 'email', 'password'];
         foreach ($requiredFields as $field) {
             if (!isset($userData[$field]) || empty($userData[$field])) {
-                return false;
+                // You can throw an exception or handle error as needed
+                throw new \InvalidArgumentException('Missing required field: ' . $field);
             }
         }
 

@@ -62,7 +62,9 @@ class UserSeeder
         ];
 
         foreach ($users as $user) {
-            $this->userModel->create($user);
+            if (!$this->userModel->createUser($user)) {
+                throw new \RuntimeException("Failed to create user: {$user['email']}");
+            }
         }
     }
 }
