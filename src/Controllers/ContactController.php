@@ -12,11 +12,19 @@ use App\Interfaces\FormControllerInterface;
  * Class ContactController
  *
  * Handles requests related to the "Contact" page.
+ *
+ * @package App\Controllers
  */
 class ContactController implements FormControllerInterface
 {
+    /**
+     * @var ValidationResponse
+     */
     private ValidationResponse $validationResponse;
 
+    /**
+     * ContactController constructor.
+     */
     public function __construct()
     {
         $this->validationResponse = new ValidationResponse();
@@ -35,6 +43,11 @@ class ContactController implements FormControllerInterface
         ]);
     }
 
+    /**
+     * Handle the form submission.
+     *
+     * @return string
+     */
     public function submit(): string
     {
         $data = [
@@ -45,18 +58,6 @@ class ContactController implements FormControllerInterface
 
         $this->validationResponse->validate($data);
         if ($this->validationResponse->hasErrors()) {
-            //echo 'Bang!';
-            //die();
-        }
-
-        if (!$this->validationResponse->hasErrors()) {
-            // Process the form
-            // For example: send email, save to database, etc.
-            return View::render('contact/success', [
-                'title' => 'Thank You',
-                'content' => 'Your message has been sent successfully.'
-            ]);
-        } else {
             // Re-render the form with errors
             return View::render('contact/show', [
                 'title' => 'Contact Us',
@@ -64,5 +65,12 @@ class ContactController implements FormControllerInterface
                 'errors' => $this->validationResponse->getErrors()
             ]);
         }
+
+        // Process the form
+        // For example: send email, save to database, etc.
+        return View::render('contact/success', [
+            'title' => 'Thank You',
+            'content' => 'Your message has been sent successfully.'
+        ]);
     }
 }

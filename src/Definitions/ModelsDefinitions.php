@@ -15,7 +15,7 @@ class ModelDefinitions
         return [
             User::class => function (Container $c) {
                 return new User($c->get(PDO::class), $c->get(EncryptionService::class));
-            },
+            }
         ];
     }
 }
