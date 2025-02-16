@@ -27,7 +27,7 @@ class BlogController
             ['title' => 'Second Blog Post', 'content' => 'This is the content of the second blog post.'],
         ];
 
-        return View::render('blog/index', [
+        return View::render('blog/show', [
             'title' => 'Blog',
             'metaDescription' => 'Read our latest blog posts',
             'blogPosts' => $blogPosts
