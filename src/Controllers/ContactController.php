@@ -19,10 +19,10 @@ class ContactController implements FormControllerInterface
     private ValidationResponse $validationResponse;
     private CSRFToken $csrfToken;
 
-    public function __construct()
+    public function __construct(ValidationResponse $validationResponse, CSRFToken $csrfToken)
     {
-        $this->validationResponse = new ValidationResponse();
-        $this->csrfToken = new CSRFToken();
+        $this->validationResponse = $validationResponse;
+        $this->csrfToken = $csrfToken;
     }
 
     /**

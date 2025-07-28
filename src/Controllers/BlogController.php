@@ -4,15 +4,16 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
-
+use App\Core\Controller;
 use App\Core\View;
+use App\Interfaces\ControllerInterface;
 
 /**
  * Class BlogController
  * 
  * Handles blog-related requests and responses.
  */
-class BlogController
+class BlogController extends Controller implements ControllerInterface
 {
     /**
      * Display the blog index page.

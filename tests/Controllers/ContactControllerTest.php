@@ -18,7 +18,14 @@ final class ContactControllerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->controller = new ContactController();
+        $validationResponse = $this->createMock(ValidationResponse::class);
+        $csrfToken = $this->createMock(\App\Security\CSRFToken::class);
+        
+        // Mock CSRF token to always return valid token
+        $csrfToken->method('generate')->willReturn('valid_token');
+        $csrfToken->method('verify')->willReturn(true);
+        
+        $this->controller = new ContactController($validationResponse, $csrfToken);
     }
 
     #[Test]

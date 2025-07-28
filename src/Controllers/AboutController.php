@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Controllers;
 
+use App\Core\Controller;
 use App\Core\View;
 use App\Interfaces\ControllerInterface;
 
@@ -12,7 +13,7 @@ use App\Interfaces\ControllerInterface;
  *
  * Handles requests related to the "About" page.
  */
-class AboutController implements ControllerInterface
+class AboutController extends Controller implements ControllerInterface
 {
     /**
      * Show the "About" page.

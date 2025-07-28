@@ -26,3 +26,6 @@ Thumbs.db
 composer.lock
 
 .phpunit.result.cache
+
+# Ignore blog post drafts and planning documents
+@docs/posts/
