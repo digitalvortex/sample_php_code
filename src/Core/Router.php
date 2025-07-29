@@ -6,6 +6,10 @@ namespace App\Core;
 
 use App\Core\Container;
 use App\Core\View;
+use App\Interfaces\RouterInterface;
+use App\Interfaces\MiddlewareInterface;
+use App\Interfaces\RequestInterface;
+use App\Interfaces\ResponseInterface;
 use InvalidArgumentException;
 use RuntimeException;
 
@@ -13,13 +17,24 @@ use RuntimeException;
  * Router Class
  * 
  * Handles HTTP request routing with support for route parameters and middleware.
+ * PHP 8.4 compatible with comprehensive middleware support.
  */
-class Router
+class Router implements RouterInterface
 {
     /**
-     * @var array<int, array{method: string, path: string, handler: string, pattern?: string}>
+     * @var array<int, array{method: string, path: string, handler: string, middleware: array, pattern?: string, name?: string}>
      */
     private array $routes = [];
+    
+    /**
+     * @var array<MiddlewareInterface> Global middleware applied to all routes
+     */
+    private array $globalMiddleware = [];
+    
+    /**
+     * @var array<string, array<MiddlewareInterface>> Named middleware groups
+     */
+    private array $middlewareGroups = [];
     
     private Container $container;
 
@@ -34,9 +49,10 @@ class Router
      * @param string $method HTTP method (GET, POST, PUT, DELETE, etc.)
      * @param string $path Route path (supports parameters like /blog/{id})
      * @param string $handler Controller@method format
+     * @param array<MiddlewareInterface> $middleware Route-specific middleware
      * @throws InvalidArgumentException
      */
-    public function addRoute(string $method, string $path, string $handler): void
+    public function addRoute(string $method, string $path, string $handler, array $middleware = []): void
     {
         if (empty($method) || empty($path) || empty($handler)) {
             throw new InvalidArgumentException('Method, path, and handler cannot be empty');
@@ -49,7 +65,8 @@ class Router
         $route = [
             'method' => strtoupper($method),
             'path' => $path,
-            'handler' => $handler
+            'handler' => $handler,
+            'middleware' => $middleware
         ];
 
         // Convert route path to regex pattern if it contains parameters
@@ -60,6 +77,31 @@ class Router
         $this->routes[] = $route;
     }
 
+    public function addRoutes(array $routes): void
+    {
+        foreach ($routes as $route) {
+            $this->addRoute(
+                $route['method'],
+                $route['path'],
+                $route['handler'],
+                $route['middleware'] ?? []
+            );
+        }
+    }
+
+    public function addGlobalMiddleware(MiddlewareInterface $middleware): void
+    {
+        $this->globalMiddleware[] = $middleware;
+        
+        // Sort by priority (lower numbers first)
+        usort($this->globalMiddleware, fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+    }
+
+    public function addMiddlewareGroup(string $name, array $middleware): void
+    {
+        $this->middlewareGroups[$name] = $middleware;
+    }
+
     /**
      * Dispatch the request to the appropriate controller
      * 
@@ -68,6 +110,67 @@ class Router
      * @throws RuntimeException
      */
     public function dispatch(string $method, string $uri): void
+    {
+        $request = new Request();
+        $response = new Response();
+        
+        // Extract locale from URI and get the locale-stripped URI for route matching
+        $localeInfo = $this->extractLocaleFromUri($uri);
+        $locale = $localeInfo['locale'];
+        $strippedUri = $localeInfo['uri'];
+        
+        // Set detected locale in request
+        if ($locale) {
+            $request->setLocale($locale);
+            
+            // Set locale in localization service if available
+            try {
+                $localizationService = $this->container->get(\App\Interfaces\LocalizationServiceInterface::class);
+                $localizationService->setLocale($locale);
+            } catch (\Throwable $e) {
+                // Localization service not available, continue without it
+            }
+        }
+        
+        $routeInfo = $this->findRoute($method, $strippedUri);
+        
+        if (!$routeInfo) {
+            $this->handleError(404, 'Page not found');
+            return;
+        }
+
+        $route = $routeInfo['route'];
+        $params = $routeInfo['params'];
+        
+        // Set route parameters in the request
+        $request->setRouteParams($params);
+
+        try {
+            // Build middleware stack (global + route-specific)
+            $middleware = array_merge($this->globalMiddleware, $route['middleware']);
+            
+            // Filter middleware that should apply to this request
+            $applicableMiddleware = array_filter(
+                $middleware,
+                fn(MiddlewareInterface $m) => $m->shouldApply($request)
+            );
+            
+            // Sort by priority
+            usort($applicableMiddleware, fn($a, $b) => $a->getPriority() <=> $b->getPriority());
+
+            // Execute middleware stack
+            $finalHandler = fn() => $this->executeRoute($route['handler'], $params, $request);
+            $response = $this->runMiddleware($request, $applicableMiddleware, $finalHandler);
+            
+            // Send the response
+            $response->send();
+            
+        } catch (\Throwable $e) {
+            $this->handleError(500, 'Internal Server Error: ' . $e->getMessage());
+        }
+    }
+
+    public function findRoute(string $method, string $uri): ?array
     {
         $method = strtoupper($method);
         
@@ -81,25 +184,36 @@ class Router
                     $matches = true;
                 }
                 // Check for pattern match with parameters
-                elseif (isset($route['pattern']) && preg_match($route['pattern'], $uri, $matches)) {
+                elseif (isset($route['pattern']) && preg_match($route['pattern'], $uri, $matchResults)) {
                     $matches = true;
                     $params = $this->extractParameters($route['path'], $uri);
                 }
             }
 
             if ($matches) {
-                try {
-                    $this->executeRoute($route['handler'], $params);
-                    return;
-                } catch (\Throwable $e) {
-                    $this->handleError(500, 'Internal Server Error: ' . $e->getMessage());
-                    return;
-                }
+                return ['route' => $route, 'params' => $params];
             }
         }
 
-        // If no route matches, return a 404 response
-        $this->handleError(404, 'Page not found');
+        return null;
+    }
+
+    public function generateUrl(string $name, array $params = []): string
+    {
+        foreach ($this->routes as $route) {
+            if (isset($route['name']) && $route['name'] === $name) {
+                $url = $route['path'];
+                
+                // Replace parameters in the URL
+                foreach ($params as $key => $value) {
+                    $url = str_replace('{' . $key . '}', (string)$value, $url);
+                }
+                
+                return $url;
+            }
+        }
+        
+        throw new InvalidArgumentException("Route '{$name}' not found");
     }
 
     /**
@@ -139,13 +253,32 @@ class Router
     }
 
     /**
+     * Run middleware stack
+     */
+    private function runMiddleware(RequestInterface $request, array $middleware, callable $finalHandler): ResponseInterface
+    {
+        $stack = array_reduce(
+            array_reverse($middleware),
+            function ($next, $middleware) {
+                return function ($request) use ($middleware, $next) {
+                    return $middleware->handle($request, $next);
+                };
+            },
+            $finalHandler
+        );
+
+        return $stack($request);
+    }
+
+    /**
      * Execute a route handler
      * 
      * @param string $handler Controller@method format
      * @param array<string, string> $params Route parameters
+     * @param RequestInterface $request The request object
      * @throws RuntimeException
      */
-    private function executeRoute(string $handler, array $params = []): void
+    private function executeRoute(string $handler, array $params = [], ?RequestInterface $request = null): ResponseInterface
     {
         [$controller, $action] = explode('@', $handler);
         
@@ -159,17 +292,57 @@ class Router
             throw new RuntimeException("Method {$action} not found in controller {$controller}");
         }
 
-        // Pass parameters to the action method if it accepts them
-        $reflection = new \ReflectionMethod($controllerInstance, $action);
-        $paramCount = $reflection->getNumberOfParameters();
+        // Create response object for the controller
+        $response = new Response();
         
-        if ($paramCount > 0 && !empty($params)) {
-            $result = $controllerInstance->$action($params);
-        } else {
-            $result = $controllerInstance->$action();
+        // Get method parameters using reflection to determine what to pass
+        $reflection = new \ReflectionMethod($controllerInstance, $action);
+        $methodParams = $reflection->getParameters();
+        $args = [];
+        
+        foreach ($methodParams as $param) {
+            $paramType = $param->getType();
+            
+            if ($paramType && !$paramType->isBuiltin()) {
+                $typeName = $paramType->getName();
+                
+                // Pass Request object if method expects it
+                if ($typeName === RequestInterface::class || is_subclass_of($typeName, RequestInterface::class)) {
+                    $args[] = $request ?? new Request();
+                }
+                // Pass Response object if method expects it
+                elseif ($typeName === ResponseInterface::class || is_subclass_of($typeName, ResponseInterface::class)) {
+                    $args[] = $response;
+                }
+                else {
+                    // Try to resolve from container
+                    try {
+                        $args[] = $this->container->get($typeName);
+                    } catch (\Exception $e) {
+                        throw new RuntimeException("Cannot resolve parameter {$param->getName()} of type {$typeName}");
+                    }
+                }
+            }
+            // Handle route parameters array
+            elseif ($param->getName() === 'params' && is_array($params)) {
+                $args[] = $params;
+            }
+            // Handle individual route parameters
+            elseif (isset($params[$param->getName()])) {
+                $args[] = $params[$param->getName()];
+            }
+            // Use default value if available
+            elseif ($param->isDefaultValueAvailable()) {
+                $args[] = $param->getDefaultValue();
+            }
+            else {
+                throw new RuntimeException("Cannot resolve required parameter {$param->getName()} for {$controller}@{$action}");
+            }
         }
 
-        $this->handleResponse($result);
+        $result = $controllerInstance->$action(...$args);
+
+        return $this->handleResponse($result);
     }
 
     /**
@@ -177,14 +350,19 @@ class Router
      * 
      * @param mixed $result Controller action result
      */
-    private function handleResponse(mixed $result): void
+    private function handleResponse(mixed $result): ResponseInterface
     {
-        if (is_array($result)) {
-            echo View::render($result['view'], $result['data'] ?? []);
+        $response = new Response();
+        
+        if ($result instanceof ResponseInterface) {
+            return $result;
+        } elseif (is_array($result)) {
+            $html = View::render($result['view'], $result['data'] ?? []);
+            return $response->html($html);
         } elseif (is_string($result)) {
-            echo $result;
+            return $response->html($result);
         } else {
-            throw new RuntimeException('Controller must return string or array with view and data keys');
+            throw new RuntimeException('Controller must return ResponseInterface, string, or array with view and data keys');
         }
     }
 
@@ -210,10 +388,75 @@ class Router
     /**
      * Get all registered routes (for testing/debugging)
      * 
-     * @return array<int, array{method: string, path: string, handler: string, pattern?: string}>
+     * @return array<array{method: string, path: string, handler: string, middleware: array}>
      */
     public function getRoutes(): array
     {
-        return $this->routes;
+        return array_map(function ($route) {
+            return [
+                'method' => $route['method'],
+                'path' => $route['path'],
+                'handler' => $route['handler'],
+                'middleware' => $route['middleware']
+            ];
+        }, $this->routes);
+    }
+
+    /**
+     * Extract locale from URI and return both locale and locale-stripped URI.
+     * 
+     * @param string $uri Original URI
+     * @return array{locale: ?string, uri: string} Locale and stripped URI
+     */
+    private function extractLocaleFromUri(string $uri): array
+    {
+        // Get supported locales - try from container or use defaults
+        $supportedLocales = ['en', 'fr', 'es', 'de', 'it'];
+        
+        try {
+            $localizationService = $this->container->get(\App\Interfaces\LocalizationServiceInterface::class);
+            $supportedLocales = $localizationService->getSupportedLocales();
+        } catch (\Throwable $e) {
+            // Use default locales if service not available
+        }
+        
+        // Parse URI path
+        $path = parse_url($uri, PHP_URL_PATH) ?: '/';
+        $path = rtrim($path, '/') ?: '/';
+        
+        // Check if URI starts with a supported locale
+        if ($path !== '/') {
+            $segments = explode('/', trim($path, '/'));
+            $firstSegment = $segments[0] ?? '';
+            
+            if (in_array($firstSegment, $supportedLocales, true)) {
+                // Remove locale from path
+                array_shift($segments);
+                $strippedPath = '/' . implode('/', $segments);
+                
+                // Handle case where only locale was in path (e.g., /fr -> /)
+                if ($strippedPath === '/') {
+                    $strippedPath = '/';
+                }
+                
+                // Rebuild URI with query string if present
+                $queryString = parse_url($uri, PHP_URL_QUERY);
+                $strippedUri = $strippedPath;
+                if ($queryString) {
+                    $strippedUri .= '?' . $queryString;
+                }
+                
+                return [
+                    'locale' => $firstSegment,
+                    'uri' => $strippedUri
+                ];
+            }
+        }
+        
+        // No locale found in URI, return original
+        return [
+            'locale' => null,
+            'uri' => $uri
+        ];
     }
 }

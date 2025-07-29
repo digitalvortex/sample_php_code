@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Core;
 
+use App\Interfaces\ContainerInterface;
 use ReflectionClass;
 use ReflectionParameter;
 use Exception;
@@ -13,8 +14,9 @@ use Exception;
  *
  * A simple dependency injection container that supports manual registration of services
  * as well as automatic dependency resolution (autowiring) for unregistered classes.
+ * PHP 8.4 compatible with comprehensive ContainerInterface implementation.
  */
-class Container
+class Container implements ContainerInterface
 {
     /**
      * An array of service definitions.
@@ -52,7 +54,7 @@ class Container
      *
      * @return mixed The resolved service instance.
      */
-    public function resolve(string $name)
+    public function resolve(string $name): mixed
     {
         if (isset($this->instances[$name])) {
             return $this->instances[$name];
@@ -79,7 +81,7 @@ class Container
      *
      * @return mixed The resolved service instance.
      */
-    public function get(string $name)
+    public function get(string $name): mixed
     {
         return $this->resolve($name);
     }
@@ -95,7 +97,7 @@ class Container
      * @return mixed The instantiated object.
      * @throws Exception If a dependency cannot be resolved.
      */
-    private function autowire(string $name)
+    private function autowire(string $name): mixed
     {
         $reflectionClass = new ReflectionClass($name);
         $constructor = $reflectionClass->getConstructor();
@@ -114,5 +116,73 @@ class Container
         }, $parameters);
 
         return $reflectionClass->newInstanceArgs($dependencies);
+    }
+
+    /**
+     * Check if a service is registered.
+     */
+    public function has(string $name): bool
+    {
+        return isset($this->services[$name]) || isset($this->instances[$name]);
+    }
+
+    /**
+     * Remove a service from the container.
+     */
+    public function remove(string $name): void
+    {
+        unset($this->services[$name], $this->instances[$name]);
+    }
+
+    /**
+     * Get all registered service names.
+     */
+    public function getServices(): array
+    {
+        return array_unique(array_merge(
+            array_keys($this->services),
+            array_keys($this->instances)
+        ));
+    }
+
+    /**
+     * Clear all services from the container.
+     */
+    public function clear(): void
+    {
+        $this->services = [];
+        $this->instances = [];
+    }
+
+    /**
+     * Register a singleton service.
+     */
+    public function singleton(string $name, callable $definition): void
+    {
+        $this->register($name, $definition, true);
+    }
+
+    /**
+     * Register a service instance directly.
+     */
+    public function instance(string $name, mixed $instance): void
+    {
+        $this->instances[$name] = $instance;
+    }
+
+    /**
+     * Check if a service is registered as singleton.
+     */
+    public function isSingleton(string $name): bool
+    {
+        return isset($this->services[$name]) && $this->services[$name]['singleton'];
+    }
+
+    /**
+     * Get service definition (for debugging).
+     */
+    public function getDefinition(string $name): ?array
+    {
+        return $this->services[$name] ?? null;
     }
 }

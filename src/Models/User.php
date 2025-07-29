@@ -10,9 +10,9 @@ namespace App\Models;
  */
 class User extends Base
 {
-    protected string $table = 'users';
+    protected static string $table = 'users';
     
-    protected array $fillable = [
+    protected static array $fillable = [
         'username',
         'email',
         'password',
@@ -23,25 +23,28 @@ class User extends Base
         'deleted_at'
     ];
     
-    protected array $encrypted = [
+    protected static array $encrypted = [
         'email',
         'first_name',
         'last_name'
+    ];
+    
+    protected static array $hidden = [
+        'password'
     ];
 
     /**
      * Create a new user with password hashing
      *
      * @param array $userData The user data to create
-     * @return int Returns the ID of the newly created user
+     * @return static Returns the newly created user instance
      */
-    public function createUser(array $userData): int
+    public static function createUser(array $userData): static
     {
         // Validate required fields
         $requiredFields = ['username', 'email', 'password'];
         foreach ($requiredFields as $field) {
             if (!isset($userData[$field]) || empty($userData[$field])) {
-                // You can throw an exception or handle error as needed
                 throw new \InvalidArgumentException('Missing required field: ' . $field);
             }
         }
@@ -54,130 +57,124 @@ class User extends Base
         // Add creation timestamp
         $userData['created_at'] = date('Y-m-d H:i:s');
         
-        return $this->create($userData);
+        return static::create($userData);
     }
 
     /**
-     * Update an existing user.
+     * Update user data with password hashing.
      * 
-     * @param int $id The ID of the user to update.
      * @param array $data The user data to update.
      * @return bool Returns true on success, false on failure.
      */
-    public function updateUser(int $id, array $data): bool
+    public function updateUser(array $data): bool
     {
-        // First check if user exists
-        $currentUser = $this->find($id);
-        if (!$currentUser) {
-            return false;
-        }
-    
-        // Now we can safely get the current password
-        $currentPassword = $currentUser['password'];
-    
-        // Handle password separately
+        // Handle password hashing if provided
         if (isset($data['password'])) {
             $data['password'] = password_hash($data['password'], PASSWORD_ARGON2ID);
-        } else {
-            $data['password'] = $currentPassword;
-        }
-    
-        // Encrypt sensitive fields if they exist in update data
-        foreach ($this->encrypted as $field) {
-            if (isset($data[$field])) {
-                $data[$field] = $this->encryptionService->encrypt($data[$field]);
-            }
         }
     
         $data['updated_at'] = date('Y-m-d H:i:s');
-    
-        $setClause = [];
-        $params = [':id' => $id];
-    
-        foreach ($this->fillable as $field) {
-            if (isset($data[$field])) {
-                $setClause[] = "$field = :$field";
-                $params[":$field"] = $data[$field];
-            }
-        }
-    
-        $sql = "UPDATE {$this->table} SET " . implode(', ', $setClause) . " WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
         
-        return $stmt->execute($params);
+        return $this->update($data);
     }
 
     /**
      * Find a user by their ID
      *
      * @param int $id The user ID
-     * @return array|null Returns user data or null if not found
+     * @return static|null Returns user instance or null if not found
      */
-    public function findUser(int $id): ?array
+    public static function findUser(int $id): ?static
     {
-        return $this->find($id);
+        return static::find($id);
     }
 
     /**
      * Get all users from the database
      *
-     * @return array Returns an array of all users
+     * @return array<static> Returns an array of all user instances
      */
-    public function findAllUsers(): array
+    public static function findAllUsers(): array
     {
-        return $this->findAll();
+        return static::all();
     }
 
     /**
      * Find all deleted users.
      * 
-     * @return array Returns an array of deleted users.
+     * @return array<static> Returns an array of deleted users.
      */
-    public function findDeleted(): array
+    public static function findDeleted(): array
     {
-        $sql = "SELECT * FROM {$this->table} WHERE deleted_at IS NOT NULL";
-        $stmt = $this->pdo->prepare($sql);
+        $sql = "SELECT * FROM " . static::getTableName() . " WHERE deleted_at IS NOT NULL";
+        $stmt = static::$pdo->prepare($sql);
         $stmt->execute();
-        $users = $stmt->fetchAll(\PDO::FETCH_ASSOC);
+        $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
 
-        // Decrypt sensitive fields for all users
-        foreach ($users as &$user) {
-            foreach ($this->encrypted as $field) {
-                if (isset($user[$field])) {
-                    $user[$field] = $this->encryptionService->decrypt($user[$field]);
-                }
-            }
+        $models = [];
+        foreach ($results as $result) {
+            $models[] = static::newFromAttributes(static::decryptAttributes($result));
         }
 
-        return $users;
+        return $models;
     }
 
     /**
-     * Soft delete a user by ID.
+     * Soft delete the user.
      * 
-     * @param int $id The ID of the user to soft delete.
      * @return bool Returns true on success, false on failure.
      */
-    public function softDelete(int $id): bool
+    public function softDelete(): bool
     {
-        $sql = "UPDATE {$this->table} SET deleted_at = :deleted_at WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([
-            ':id' => $id, 
+        if (!$this->exists) {
+            return false;
+        }
+        
+        $sql = "UPDATE " . static::getTableName() . " SET deleted_at = :deleted_at WHERE " . static::$primaryKey . " = :id";
+        $stmt = static::$pdo->prepare($sql);
+        $result = $stmt->execute([
+            ':id' => $this->getId(), 
             ':deleted_at' => date('Y-m-d H:i:s')
         ]);
+        
+        if ($result) {
+            $this->attributes['deleted_at'] = date('Y-m-d H:i:s');
+        }
+        
+        return $result;
     }
-
+    
     /**
-     * Delete a user by ID.
+     * Check if user password matches.
      * 
-     * @param int $id The ID of the user to delete.
-     * @return bool Returns true on success, false on failure.
+     * @param string $password The password to verify
+     * @return bool Returns true if password matches
      */
-    public function delete(int $id): bool
+    public function verifyPassword(string $password): bool
     {
-        $sql = "DELETE FROM {$this->table} WHERE id = :id";
-        $stmt = $this->pdo->prepare($sql);
-        return $stmt->execute([':id' => $id]);
+        return password_verify($password, $this->getAttribute('password'));
+    }
+    
+    /**
+     * Get user's full name.
+     * 
+     * @return string The user's full name
+     */
+    public function getFullName(): string
+    {
+        $firstName = $this->getAttribute('first_name') ?? '';
+        $lastName = $this->getAttribute('last_name') ?? '';
+        
+        return trim($firstName . ' ' . $lastName);
+    }
+    
+    /**
+     * Check if user is deleted (soft deleted).
+     * 
+     * @return bool True if user is soft deleted
+     */
+    public function isDeleted(): bool
+    {
+        return $this->getAttribute('deleted_at') !== null;
     }
 }

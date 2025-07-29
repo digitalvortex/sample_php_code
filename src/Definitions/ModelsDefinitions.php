@@ -17,16 +17,20 @@ class ModelsDefinitions
     {
         return [
             User::class => function (Container $c) {
-                return new User($c->get(PDO::class), $c->get(EncryptionService::class));
+                User::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new User();
             },
             Level::class => function (Container $c) {
-                return new Level($c->get(PDO::class), $c->get(EncryptionService::class));
+                Level::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new Level();
             },
             Blog::class => function (Container $c) {
-                return new Blog($c->get(PDO::class), $c->get(EncryptionService::class));
+                Blog::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new Blog();
             },
             Session::class => function (Container $c) {
-                return new Session($c->get(PDO::class), $c->get(EncryptionService::class));
+                Session::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new Session();
             },
         ];
     }

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="<?= function_exists('get_locale') ? get_locale() : 'en' ?>">
 
 <head>
     <meta charset="UTF-8">
@@ -48,11 +48,48 @@
                     </button>
                     
                     <ul class="nav-menu" id="nav-menu">
-                        <li><a href="/" <?= ($_SERVER['REQUEST_URI'] === '/') ? 'class="active"' : '' ?>>Home</a></li>
-                        <li><a href="/about" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/about')) ? 'class="active"' : '' ?>>About</a></li>
-                        <li><a href="/services" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/services')) ? 'class="active"' : '' ?>>Services</a></li>
-                        <li><a href="/blog" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/blog')) ? 'class="active"' : '' ?>>Blog</a></li>
-                        <li><a href="/contact" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/contact')) ? 'class="active"' : '' ?>>Contact</a></li>
+                        <li><a href="/" <?= ($_SERVER['REQUEST_URI'] === '/') ? 'class="active"' : '' ?>><?= function_exists('trans') ? trans('common.home') : 'Home' ?></a></li>
+                        <li><a href="/about" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/about')) ? 'class="active"' : '' ?>><?= function_exists('trans') ? trans('common.about') : 'About' ?></a></li>
+                        <li><a href="/services" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/services')) ? 'class="active"' : '' ?>><?= function_exists('trans') ? trans('common.services') : 'Services' ?></a></li>
+                        <li><a href="/blog" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/blog')) ? 'class="active"' : '' ?>><?= function_exists('trans') ? trans('common.blog') : 'Blog' ?></a></li>
+                        <li><a href="/contact" <?= (str_starts_with($_SERVER['REQUEST_URI'], '/contact')) ? 'class="active"' : '' ?>><?= function_exists('trans') ? trans('common.contact') : 'Contact' ?></a></li>
+                        
+                        <!-- Language Selector -->
+                        <li class="language-selector">
+                            <button class="language-toggle" aria-label="Select language" id="language-button">
+                                <span class="language-icon">🌐</span>
+                                <span class="current-language"><?= function_exists('get_locale') ? strtoupper(get_locale()) : 'EN' ?></span>
+                                <span class="dropdown-arrow">▼</span>
+                            </button>
+                            <ul class="language-dropdown" id="language-dropdown">
+                                <?php
+                                $supportedLocales = [
+                                    'en' => ['name' => 'English', 'native' => 'English'],
+                                    'fr' => ['name' => 'French', 'native' => 'Français'],
+                                    'es' => ['name' => 'Spanish', 'native' => 'Español'],
+                                    'de' => ['name' => 'German', 'native' => 'Deutsch'],
+                                    'it' => ['name' => 'Italian', 'native' => 'Italiano']
+                                ];
+                                $currentLocale = function_exists('get_locale') ? get_locale() : 'en';
+                                
+                                foreach ($supportedLocales as $locale => $info):
+                                    $isActive = $locale === $currentLocale;
+                                ?>
+                                <li>
+                                    <a href="/language/switch/<?= $locale ?>" 
+                                       class="language-option <?= $isActive ? 'active' : '' ?>"
+                                       data-locale="<?= $locale ?>"
+                                       aria-label="Switch to <?= $info['name'] ?>">
+                                        <span class="language-code"><?= strtoupper($locale) ?></span>
+                                        <span class="language-name"><?= $info['native'] ?></span>
+                                        <?php if ($isActive): ?>
+                                        <span class="active-indicator">✓</span>
+                                        <?php endif; ?>
+                                    </a>
+                                </li>
+                                <?php endforeach; ?>
+                            </ul>
+                        </li>
                     </ul>
                 </nav>
             </div>
@@ -68,45 +105,44 @@
             <div class="container">
                 <div class="footer-content">
                     <div class="footer-section">
-                        <h3 class="footer-title">SampleSite</h3>
+                        <h3 class="footer-title"><?= trans('common.footer.brand') ?></h3>
                         <p class="footer-description">
-                            A modern PHP MVC framework demonstration showcasing clean architecture, 
-                            responsive design, and best practices in web development.
+                            <?= trans('common.footer.description') ?>
                         </p>
                     </div>
                     
                     <div class="footer-section">
-                        <h4 class="footer-subtitle">Quick Links</h4>
+                        <h4 class="footer-subtitle"><?= trans('common.footer.quick_links') ?></h4>
                         <ul class="footer-links">
-                            <li><a href="/">Home</a></li>
-                            <li><a href="/about">About</a></li>
-                            <li><a href="/services">Services</a></li>
-                            <li><a href="/blog">Blog</a></li>
-                            <li><a href="/contact">Contact</a></li>
+                            <li><a href="/"><?= trans('common.home') ?></a></li>
+                            <li><a href="/about"><?= trans('common.about') ?></a></li>
+                            <li><a href="/services"><?= trans('common.services') ?></a></li>
+                            <li><a href="/blog"><?= trans('common.blog') ?></a></li>
+                            <li><a href="/contact"><?= trans('common.contact') ?></a></li>
                         </ul>
                     </div>
                     
                     <div class="footer-section">
-                        <h4 class="footer-subtitle">Technology</h4>
+                        <h4 class="footer-subtitle"><?= trans('common.footer.technology') ?></h4>
                         <ul class="footer-links">
-                            <li>PHP 8.4</li>
-                            <li>MVC Architecture</li>
-                            <li>Dependency Injection</li>
-                            <li>Responsive Design</li>
-                            <li>Modern CSS</li>
+                            <li><?= trans('common.footer.technologies.php') ?></li>
+                            <li><?= trans('common.footer.technologies.mvc') ?></li>
+                            <li><?= trans('common.footer.technologies.di') ?></li>
+                            <li><?= trans('common.footer.technologies.responsive') ?></li>
+                            <li><?= trans('common.footer.technologies.css') ?></li>
                         </ul>
                     </div>
                 </div>
                 
                 <div class="footer-bottom">
-                    <p>&copy; <?= date('Y') ?> SampleSite. Built with ❤️ using modern PHP.</p>
+                    <p><?= trans('common.footer.copyright', ['year' => date('Y')]) ?></p>
                 </div>
             </div>
         </footer>
     </div>
 
     <!-- Skip to main content link for accessibility -->
-    <a href="#main-content" class="skip-link">Skip to main content</a>
+    <a href="#main-content" class="skip-link"><?= trans('common.footer.skip_to_content') ?></a>
 </body>
 
 </html>

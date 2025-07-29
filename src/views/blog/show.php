@@ -2,8 +2,8 @@
 <section class="hero">
     <div class="container">
         <div class="hero-content animate-fadeInUp">
-            <h1>Our Blog</h1>
-            <p>Insights, tutorials, and thoughts on modern web development, PHP best practices, and the latest in technology.</p>
+            <h1><?= trans('pages.blog.header.title') ?></h1>
+            <p><?= trans('pages.blog.header.subtitle') ?></p>
         </div>
     </div>
 </section>
@@ -25,9 +25,9 @@
                         </svg>
                     </div>
                 </div>
-                <h2>Coming Soon</h2>
-                <p class="section-subtitle mb-8">We're working on some exciting blog posts about modern PHP development, MVC architecture, and web development best practices.</p>
-                <a href="/contact" class="btn btn-primary">Get Notified</a>
+                <h2><?= trans('pages.blog.empty.title') ?></h2>
+                <p class="section-subtitle mb-8"><?= trans('pages.blog.empty.description') ?></p>
+                <a href="/contact" class="btn btn-primary"><?= trans('pages.blog.empty.button') ?></a>
             </div>
         <?php else: ?>
             <!-- Blog Grid -->
@@ -42,14 +42,14 @@
                                         <circle cx="12" cy="12" r="10"/>
                                         <polyline points="12,6 12,12 16,14"/>
                                     </svg>
-                                    <span><?= date('M j, Y', strtotime($post['created_at'] ?? 'now')) ?></span>
+                                    <span><?= trans('pages.blog.post.published_on', ['date' => date('M j, Y', strtotime($post['created_at'] ?? 'now'))]) ?></span>
                                 </div>
                                 <div style="display: flex; align-items: center; gap: var(--space-1);">
                                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                         <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
                                         <circle cx="12" cy="7" r="4"/>
                                     </svg>
-                                    <span><?= htmlspecialchars($post['author'] ?? 'SampleSite Team') ?></span>
+                                    <span><?= trans('pages.blog.post.by_author', ['author' => htmlspecialchars($post['author'] ?? 'SampleSite Team')]) ?></span>
                                 </div>
                             </div>
 
@@ -80,7 +80,7 @@
                                     <path d="M5 12h14"/>
                                     <path d="M12 5l7 7-7 7"/>
                                 </svg>
-                                Read More
+                                <?= trans('pages.blog.post.read_more') ?>
                             </a>
                         </div>
                     </article>
@@ -91,8 +91,8 @@
             <?php if (count($blogPosts) >= 6): ?>
                 <div class="text-center mt-12">
                     <div style="display: inline-flex; gap: var(--space-2);">
-                        <a href="#" class="btn btn-secondary">← Previous</a>
-                        <a href="#" class="btn btn-secondary">Next →</a>
+                        <a href="#" class="btn btn-secondary"><?= trans('pages.blog.pagination.previous') ?></a>
+                        <a href="#" class="btn btn-secondary"><?= trans('pages.blog.pagination.next') ?></a>
                     </div>
                 </div>
             <?php endif; ?>
@@ -104,8 +104,8 @@
 <section class="bg-gray-50" style="padding: var(--space-20) 0;">
     <div class="container">
         <div class="section-header text-center mb-8">
-            <h2>Featured Topics</h2>
-            <p class="section-subtitle">Explore our expertise in modern web development</p>
+            <h2><?= trans('pages.blog.topics.title') ?></h2>
+            <p class="section-subtitle"><?= trans('pages.blog.topics.subtitle') ?></p>
         </div>
         
         <div class="grid grid-cols-3">
@@ -113,18 +113,18 @@
             $topics = [
                 [
                     'icon' => '<polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/>',
-                    'title' => 'PHP 8.4 Features',
-                    'description' => 'Exploring the latest PHP features including strict typing, attributes, and performance improvements.'
+                    'title' => trans('pages.blog.topics.php_features.title'),
+                    'description' => trans('pages.blog.topics.php_features.description')
                 ],
                 [
                     'icon' => '<path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/>',
-                    'title' => 'MVC Architecture',
-                    'description' => 'Deep dives into clean architecture patterns, dependency injection, and SOLID principles.'
+                    'title' => trans('pages.blog.topics.mvc_architecture.title'),
+                    'description' => trans('pages.blog.topics.mvc_architecture.description')
                 ],
                 [
                     'icon' => '<path d="M9 12l2 2 4-4"/><path d="M21 12c.552 0 1-.448 1-1V9a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v2c0 .552.448 1 1 1s1 .448 1 1v2a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-2c0-.552.448-1 1-1z"/>',
-                    'title' => 'Testing Best Practices',
-                    'description' => 'Comprehensive guides on PHPUnit, test-driven development, and quality assurance strategies.'
+                    'title' => trans('pages.blog.topics.testing.title'),
+                    'description' => trans('pages.blog.topics.testing.description')
                 ]
             ];
             
@@ -150,12 +150,12 @@
 <!-- Newsletter Section -->
 <section class="cta-section">
     <div class="container text-center">
-        <h2>Stay Updated</h2>
-        <p>Subscribe to our newsletter for the latest insights on web development, PHP best practices, and technology trends.</p>
+        <h2><?= trans('pages.blog.newsletter.title') ?></h2>
+        <p><?= trans('pages.blog.newsletter.description') ?></p>
         <div class="mt-8">
             <form style="display: inline-flex; gap: var(--space-4); max-width: 400px; width: 100%;">
-                <input type="email" placeholder="Enter your email" class="form-input" style="flex: 1; margin: 0;">
-                <button type="submit" class="btn btn-secondary">Subscribe</button>
+                <input type="email" placeholder="<?= trans('pages.blog.newsletter.placeholder') ?>" class="form-input" style="flex: 1; margin: 0;">
+                <button type="submit" class="btn btn-secondary"><?= trans('pages.blog.newsletter.button') ?></button>
             </form>
         </div>
     </div>

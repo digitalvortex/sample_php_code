@@ -2,8 +2,8 @@
 <section class="hero">
     <div class="container">
         <div class="hero-content animate-fadeInUp">
-            <h1>About SampleSite</h1>
-            <p>Passionate about creating exceptional web experiences with modern technology and clean, maintainable code.</p>
+            <h1><?= trans('pages.about.hero.title') ?></h1>
+            <p><?= trans('pages.about.hero.subtitle') ?></p>
         </div>
     </div>
 </section>
@@ -13,12 +13,12 @@
     <div class="container">
         <div class="grid grid-cols-2" style="gap: var(--space-12); align-items: center;">
             <div class="animate-fadeInUp">
-                <h2>Our Story</h2>
-                <p class="mb-6">SampleSite represents the evolution of modern web development, showcasing how PHP can be leveraged with contemporary patterns and practices to build robust, scalable applications.</p>
+                <h2><?= trans('pages.about.story.title') ?></h2>
+                <p class="mb-6"><?= trans('pages.about.story.paragraph1') ?></p>
                 
-                <p class="mb-6">We believe in writing clean, testable code that follows SOLID principles and modern PHP standards. Our approach combines the reliability of traditional MVC architecture with cutting-edge features like dependency injection, strict typing, and comprehensive testing.</p>
+                <p class="mb-6"><?= trans('pages.about.story.paragraph2') ?></p>
                 
-                <p>Every line of code is crafted with purpose, security, and maintainability in mind, ensuring that our applications not only work today but continue to evolve with tomorrow's requirements.</p>
+                <p><?= trans('pages.about.story.paragraph3') ?></p>
             </div>
             
             <div class="text-center animate-fadeInUp" style="animation-delay: 0.2s;">
@@ -31,8 +31,8 @@
                                 </svg>
                             </div>
                         </div>
-                        <h3>Quality First</h3>
-                        <p>Every project reflects our commitment to excellence, from code architecture to user experience.</p>
+                        <h3><?= trans('pages.about.quality.title') ?></h3>
+                        <p><?= trans('pages.about.quality.description') ?></p>
                     </div>
                 </div>
             </div>
@@ -44,8 +44,8 @@
 <section class="bg-gray-50" style="padding: var(--space-20) 0;">
     <div class="container">
         <div class="section-header text-center mb-8">
-            <h2>Our Values</h2>
-            <p class="section-subtitle">The principles that guide everything we do</p>
+            <h2><?= trans('pages.about.values.title') ?></h2>
+            <p class="section-subtitle"><?= trans('pages.about.values.subtitle') ?></p>
         </div>
         
         <div class="grid grid-cols-3">
@@ -59,8 +59,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>Excellence</h3>
-                    <p>We strive for perfection in every aspect of development, from clean code to exceptional user experiences.</p>
+                    <h3><?= trans('pages.about.values.excellence.title') ?></h3>
+                    <p><?= trans('pages.about.values.excellence.description') ?></p>
                 </div>
             </div>
             
@@ -73,8 +73,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>Innovation</h3>
-                    <p>Embracing modern technologies and methodologies to stay at the forefront of web development.</p>
+                    <h3><?= trans('pages.about.values.innovation.title') ?></h3>
+                    <p><?= trans('pages.about.values.innovation.description') ?></p>
                 </div>
             </div>
             
@@ -90,8 +90,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>Collaboration</h3>
-                    <p>Working together to create solutions that exceed expectations and deliver real value.</p>
+                    <h3><?= trans('pages.about.values.collaboration.title') ?></h3>
+                    <p><?= trans('pages.about.values.collaboration.description') ?></p>
                 </div>
             </div>
         </div>
@@ -102,8 +102,8 @@
 <section class="bg-white" style="padding: var(--space-20) 0;">
     <div class="container">
         <div class="section-header text-center mb-8">
-            <h2>Technical Expertise</h2>
-            <p class="section-subtitle">Modern technologies and proven methodologies</p>
+            <h2><?= trans('pages.about.technical.title') ?></h2>
+            <p class="section-subtitle"><?= trans('pages.about.technical.subtitle') ?></p>
         </div>
         
         <div class="grid grid-cols-2">
@@ -115,8 +115,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Modern PHP Development</h4>
-                    <p>PHP 8.4 with strict typing, attributes, and modern language features for robust applications.</p>
+                    <h4><?= trans('pages.about.technical.modern_php.title') ?></h4>
+                    <p><?= trans('pages.about.technical.modern_php.description') ?></p>
                 </div>
             </div>
             
@@ -127,8 +127,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Test-Driven Development</h4>
-                    <p>Comprehensive testing with PHPUnit 11, ensuring reliability and maintainability.</p>
+                    <h4><?= trans('pages.about.technical.test_driven.title') ?></h4>
+                    <p><?= trans('pages.about.technical.test_driven.description') ?></p>
                 </div>
             </div>
             
@@ -141,8 +141,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Clean Architecture</h4>
-                    <p>SOLID principles, dependency injection, and separation of concerns for maintainable code.</p>
+                    <h4><?= trans('pages.about.technical.clean_architecture.title') ?></h4>
+                    <p><?= trans('pages.about.technical.clean_architecture.description') ?></p>
                 </div>
             </div>
             
@@ -155,8 +155,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Responsive Design</h4>
-                    <p>Mobile-first approach with fluid typography and accessible, modern user interfaces.</p>
+                    <h4><?= trans('pages.about.technical.responsive_design.title') ?></h4>
+                    <p><?= trans('pages.about.technical.responsive_design.description') ?></p>
                 </div>
             </div>
         </div>

@@ -7,6 +7,7 @@ use App\Config\LoadEnv;
 use App\Core\Container;
 use App\Definitions\DatabaseDefinitions;
 use App\Definitions\RoutingDefinitions;
+use App\Definitions\LocalizationDefinitions;
 //use App\Definitions\ModelsDefinitions;
 //use App\Seeders\UserSeeder;
 use App\Services\EncryptionService;
@@ -41,6 +42,15 @@ foreach (RoutingDefinitions::getDefinitions() as $name => $definition) {
     $container->register($name, $definition, true);
 }
 
+// Register localization services
+foreach (LocalizationDefinitions::getDefinitions() as $name => $definition) {
+    $container->register($name, $definition, true);
+}
+
+// Load localization helper functions
+require_once __DIR__ . '/src/Helpers/LocalizationHelpers.php';
+require_once __DIR__ . '/src/Helpers/ConfigHelpers.php';
+
 $container->register(ValidationResponse::class, function (Container $c) {
     return new ValidationResponse();
 }, true);
@@ -48,5 +58,8 @@ $container->register(ValidationResponse::class, function (Container $c) {
 $container->register(CSRFToken::class, function (Container $c) {
     return new CSRFToken();
 }, true);
+
+// Make container available globally for helper functions
+$GLOBALS['container'] = $container;
 
 return $container;

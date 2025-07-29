@@ -2,11 +2,11 @@
 <section class="hero" id="main-content">
     <div class="container">
         <div class="hero-content animate-fadeInUp">
-            <h1>Welcome to SampleSite</h1>
-            <p>Experience the future of web development with our modern PHP MVC framework. Built with clean architecture, security-first approach, and responsive design principles.</p>
+            <h1><?= trans('pages.home.hero.title') ?></h1>
+            <p><?= trans('pages.home.hero.subtitle') ?></p>
             <div class="hero-cta">
-                <a href="/services" class="btn btn-primary btn-lg">Explore Our Services</a>
-                <a href="/about" class="btn btn-outline btn-lg">Learn More</a>
+                <a href="/services" class="btn btn-primary btn-lg"><?= trans('pages.home.hero.cta_services') ?></a>
+                <a href="/about" class="btn btn-outline btn-lg"><?= trans('pages.home.hero.cta_learn_more') ?></a>
             </div>
         </div>
     </div>
@@ -16,8 +16,8 @@
 <section class="features-section bg-white">
     <div class="container">
         <div class="section-header text-center mb-8">
-            <h2>Modern Web Development</h2>
-            <p class="section-subtitle">Built with the latest technologies and best practices</p>
+            <h2><?= trans('pages.home.features.title') ?></h2>
+            <p class="section-subtitle"><?= trans('pages.home.features.subtitle') ?></p>
         </div>
         
         <div class="grid grid-cols-3">
@@ -30,8 +30,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>High Performance</h3>
-                    <p>Optimized routing system with container-based dependency injection for lightning-fast response times.</p>
+                    <h3><?= trans('pages.home.features.performance.title') ?></h3>
+                    <p><?= trans('pages.home.features.performance.description') ?></p>
                 </div>
             </div>
             
@@ -46,8 +46,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>Security First</h3>
-                    <p>Built-in CSRF protection, input validation, and encryption services to keep your data safe and secure.</p>
+                    <h3><?= trans('pages.home.features.security.title') ?></h3>
+                    <p><?= trans('pages.home.features.security.description') ?></p>
                 </div>
             </div>
             
@@ -62,8 +62,8 @@
                             </svg>
                         </div>
                     </div>
-                    <h3>Responsive Design</h3>
-                    <p>Mobile-first approach with fluid typography and adaptive layouts that work perfectly on any device.</p>
+                    <h3><?= trans('pages.home.features.responsive.title') ?></h3>
+                    <p><?= trans('pages.home.features.responsive.description') ?></p>
                 </div>
             </div>
         </div>
@@ -74,8 +74,8 @@
 <section class="tech-section bg-gray-50">
     <div class="container">
         <div class="section-header text-center mb-8">
-            <h2>Modern Technology Stack</h2>
-            <p class="section-subtitle">Built with cutting-edge PHP 8.4 features and industry best practices</p>
+            <h2><?= trans('pages.home.technology.title') ?></h2>
+            <p class="section-subtitle"><?= trans('pages.home.technology.subtitle') ?></p>
         </div>
         
         <div class="grid grid-cols-2">
@@ -87,8 +87,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>PHP 8.4 Strict Typing</h4>
-                    <p>Modern PHP with strict type declarations, named parameters, and match expressions for better code quality.</p>
+                    <h4><?= trans('pages.home.technology.php_typing.title') ?></h4>
+                    <p><?= trans('pages.home.technology.php_typing.description') ?></p>
                 </div>
             </div>
             
@@ -101,8 +101,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>MVC Architecture</h4>
-                    <p>Clean separation of concerns with Models, Views, and Controllers following SOLID principles.</p>
+                    <h4><?= trans('pages.home.technology.mvc_architecture.title') ?></h4>
+                    <p><?= trans('pages.home.technology.mvc_architecture.description') ?></p>
                 </div>
             </div>
             
@@ -113,8 +113,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Dependency Injection</h4>
-                    <p>Container-based DI with autowiring for loosely coupled, testable, and maintainable code.</p>
+                    <h4><?= trans('pages.home.technology.dependency_injection.title') ?></h4>
+                    <p><?= trans('pages.home.technology.dependency_injection.description') ?></p>
                 </div>
             </div>
             
@@ -126,8 +126,8 @@
                     </svg>
                 </div>
                 <div>
-                    <h4>Comprehensive Testing</h4>
-                    <p>PHPUnit 11 with attributes, 77 tests with 188 assertions ensuring code quality and reliability.</p>
+                    <h4><?= trans('pages.home.technology.testing.title') ?></h4>
+                    <p><?= trans('pages.home.technology.testing.description') ?></p>
                 </div>
             </div>
         </div>
@@ -137,11 +137,11 @@
 <!-- Call-to-Action Section -->
 <section class="cta-section">
     <div class="container text-center">
-        <h2>Ready to Get Started?</h2>
-        <p>Explore our services and see how we can help bring your ideas to life with modern web development.</p>
+        <h2><?= trans('pages.home.cta.title') ?></h2>
+        <p><?= trans('pages.home.cta.subtitle') ?></p>
         <div class="cta-buttons mt-8">
-            <a href="/contact" class="btn btn-primary btn-lg">Get In Touch</a>
-            <a href="/blog" class="btn btn-outline btn-lg">Read Our Blog</a>
+            <a href="/contact" class="btn btn-primary btn-lg"><?= trans('pages.home.cta.contact_button') ?></a>
+            <a href="/blog" class="btn btn-outline btn-lg"><?= trans('pages.home.cta.blog_button') ?></a>
         </div>
     </div>
 </section>

@@ -13,10 +13,50 @@ use App\Interfaces\ControllerInterface;
  * Class BlogAdminController
  * 
  * Handles administrative blog operations with access control.
+ * PHP 8.4 compatible with full ControllerInterface implementation.
  */
 class BlogAdminController extends Controller implements ControllerInterface
 {
     use ACLControl;
+
+    private array $viewData = [];
+
+    /**
+     * Handle any initialization logic for the controller.
+     */
+    public function initialize(): void
+    {
+        // Set default view data for the blog admin controller
+        $this->setViewData([
+            'controller' => $this->getName(),
+            'section' => 'admin'
+        ]);
+    }
+
+    /**
+     * Get the controller's name/identifier.
+     */
+    public function getName(): string
+    {
+        return 'blog-admin';
+    }
+
+    /**
+     * Set data to be passed to views.
+     */
+    public function setViewData(array $data): static
+    {
+        $this->viewData = array_merge($this->viewData, $data);
+        return $this;
+    }
+
+    /**
+     * Get all view data.
+     */
+    public function getViewData(): array
+    {
+        return $this->viewData;
+    }
 
     /**
      * Show a specific blog post.
@@ -25,11 +65,18 @@ class BlogAdminController extends Controller implements ControllerInterface
      */
     public function show(): string
     {
+        // Ensure controller is initialized
+        if (empty($this->viewData)) {
+            $this->initialize();
+        }
+
         // Allow all users to view blog posts
-        return View::render('blog/show', [
+        $this->setViewData([
             'title' => 'Blog Post',
             'metaDescription' => 'Read the latest blog post.'
         ]);
+
+        return View::render('blog/show', $this->getViewData());
     }
 
     /**

@@ -1,0 +1,295 @@
+{
+    "home": {
+        "title": "Home",
+        "meta_description": "Benvenuto su SampleSite - Vivi lo sviluppo web moderno con il nostro framework PHP MVC.",
+        "hero": {
+            "title": "Benvenuto su SampleSite",
+            "subtitle": "Vivi il futuro dello sviluppo web con il nostro moderno framework PHP MVC. Costruito con architettura pulita, approccio security-first e principi di design responsive.",
+            "cta_services": "Esplora i Nostri Servizi",
+            "cta_learn_more": "Scopri di Più"
+        },
+        "features": {
+            "title": "Sviluppo Web Moderno",
+            "subtitle": "Costruito con le ultime tecnologie e le migliori pratiche",
+            "performance": {
+                "title": "Alte Prestazioni",
+                "description": "Sistema di routing ottimizzato con dependency injection basata su container per tempi di risposta fulminei."
+            },
+            "security": {
+                "title": "Sicurezza Prima",
+                "description": "Protezione CSRF integrata, validazione input e servizi di crittografia per mantenere i tuoi dati al sicuro e protetti."
+            },
+            "responsive": {
+                "title": "Design Responsive",
+                "description": "Approccio mobile-first con tipografia fluida e layout adattivi che funzionano perfettamente su qualsiasi dispositivo."
+            }
+        },
+        "technology": {
+            "title": "Stack tecnologico Moderno",
+            "subtitle": "Costruito con funzionalità PHP 8.4 all'avanguardia e migliori pratiche del settore",
+            "php_typing": {
+                "title": "Tipizzazione Rigorosa PHP 8.4",
+                "description": "PHP moderno con dichiarazioni di tipo rigorose, parametri nominati ed espressioni match per una migliore qualità del codice."
+            },
+            "mvc_architecture": {
+                "title": "Architettura MVC",
+                "description": "Separazione pulita delle responsabilità con Models, Views e Controllers seguendo i principi SOLID."
+            },
+            "dependency_injection": {
+                "title": "Dependency Injection",
+                "description": "DI basata su container con autowiring per codice debolmente accoppiato, testabile e mantenibile."
+            },
+            "testing": {
+                "title": "Testing Completo",
+                "description": "PHPUnit 11 con attributi, 77 test con 188 asserzioni garantendo qualità e affidabilità del codice."
+            }
+        },
+        "cta": {
+            "title": "Pronto per Iniziare?",
+            "subtitle": "Esplora i nostri servizi e scopri come possiamo aiutarti a dare vita alle tue idee con lo sviluppo web moderno.",
+            "contact_button": "Mettiti in Contatto",
+            "blog_button": "Leggi il Nostro Blog"
+        }
+    },
+    "about": {
+        "title": "Chi siamo",
+        "meta_description": "Scopri di più sulla nostra azienda e la nostra missione.",
+        "hero": {
+            "title": "Informazioni su SampleSite",
+            "subtitle": "Appassionati nella creazione di esperienze web eccezionali con tecnologia moderna e codice pulito e mantenibile."
+        },
+        "story": {
+            "title": "La nostra storia",
+            "paragraph1": "SampleSite rappresenta l'evoluzione dello sviluppo web moderno, mostrando come PHP può essere utilizzato con pattern e pratiche contemporanee per costruire applicazioni robuste e scalabili.",
+            "paragraph2": "Crediamo nella scrittura di codice pulito e testabile che segue i principi SOLID e gli standard PHP moderni. Il nostro approccio combina l'affidabilità dell'architettura MVC tradizionale con funzionalità all'avanguardia come dependency injection, tipizzazione rigorosa e test completi.",
+            "paragraph3": "Ogni riga di codice è creata con proposito, sicurezza e manutenibilità in mente, garantendo che le nostre applicazioni non solo funzionino oggi ma continuino ad evolversi con i requisiti di domani."
+        },
+        "quality": {
+            "title": "Qualità prima di tutto",
+            "description": "Ogni progetto riflette il nostro impegno per l'eccellenza, dall'architettura del codice all'esperienza utente."
+        },
+        "values": {
+            "title": "I nostri valori",
+            "subtitle": "I principi che guidano tutto quello che facciamo",
+            "excellence": {
+                "title": "Eccellenza",
+                "description": "Aspiriamo alla perfezione in ogni aspetto dello sviluppo, dal codice pulito alle esperienze utente eccezionali."
+            },
+            "innovation": {
+                "title": "Innovazione",
+                "description": "Abbracciando tecnologie e metodologie moderne per rimanere all'avanguardia dello sviluppo web."
+            },
+            "collaboration": {
+                "title": "Collaborazione",
+                "description": "Lavorando insieme per creare soluzioni che superano le aspettative e forniscono valore reale."
+            }
+        },
+        "technical": {
+            "title": "Competenza tecnica",
+            "subtitle": "Tecnologie moderne e metodologie comprovate",
+            "modern_php": {
+                "title": "Sviluppo PHP moderno",
+                "description": "PHP 8.4 con tipizzazione rigorosa, attributi e funzionalità linguistiche moderne per applicazioni robuste."
+            },
+            "test_driven": {
+                "title": "Sviluppo guidato dai test",
+                "description": "Test completi con PHPUnit 11, garantendo affidabilità e manutenibilità."
+            },
+            "clean_architecture": {
+                "title": "Architettura pulita",  
+                "description": "Principi SOLID, dependency injection e separazione delle responsabilità per codice mantenibile."
+            },
+            "responsive_design": {
+                "title": "Design responsive",
+                "description": "Approccio mobile-first con tipografia fluida e interfacce utente accessibili e moderne."
+            }
+        }
+    },
+    "services": {
+        "title": "Servizi",
+        "meta_description": "Soluzioni complete di sviluppo web progettate per elevare la tua presenza digitale e guidare la crescita del business.",
+        "hero": {
+            "title": "I Nostri Servizi",
+            "subtitle": "Soluzioni complete di sviluppo web progettate per elevare la tua presenza digitale e guidare la crescita del business."
+        },
+        "overview": {
+            "title": "Cosa Offriamo",
+            "subtitle": "Servizi professionali su misura per le tue esigenze uniche"
+        },
+        "services_list": {
+            "web_development": {
+                "title": "Sviluppo Web",
+                "description": "Applicazioni web personalizzate costruite con PHP moderno, con architettura pulita, design security-first e interfacce utente responsive."
+            },
+            "ui_ux_design": {
+                "title": "Design UI/UX",
+                "description": "Soluzioni di design centrate sull'utente che creano esperienze digitali intuitive, accessibili e visivamente accattivanti."
+            },
+            "security_audits": {
+                "title": "Audit di Sicurezza",
+                "description": "Valutazioni di sicurezza complete per identificare vulnerabilità e implementare misure di protezione robuste."
+            },
+            "api_development": {
+                "title": "Sviluppo API",
+                "description": "API RESTful e microservizi progettati per scalabilità, performance e integrazione senza soluzione di continuità."
+            },
+            "quality_assurance": {
+                "title": "Garanzia di Qualità",
+                "description": "Strategie di testing complete inclusi unit test, integration test e pipeline di test automatizzate."
+            },
+            "code_review": {
+                "title": "Revisione del Codice",
+                "description": "Audit professionali del codice focalizzati su best practice, ottimizzazione delle performance e manutenibilità."
+            }
+        },
+        "process": {
+            "title": "Il Nostro Processo",
+            "subtitle": "Una metodologia comprovata che produce risultati eccezionali",
+            "discovery": {
+                "title": "Scoperta",
+                "description": "Comprendere i tuoi obiettivi, requisiti e vincoli tecnici."
+            },
+            "planning": {
+                "title": "Pianificazione",
+                "description": "Creare roadmap dettagliate del progetto e specifiche tecniche."
+            },
+            "development": {
+                "title": "Sviluppo",
+                "description": "Costruire soluzioni robuste e scalabili con best practice moderne."
+            },
+            "delivery": {
+                "title": "Consegna",
+                "description": "Testing, deployment e supporto continuo per il tuo successo."
+            }
+        },
+        "technologies": {
+            "title": "Tecnologie che Usiamo",
+            "subtitle": "Strumenti e framework moderni per soluzioni all'avanguardia",
+            "php": {
+                "title": "PHP 8.4",
+                "description": "Ultime funzionalità PHP inclusi tipizzazione rigorosa, attributi e miglioramenti delle performance."
+            },
+            "mvc": {
+                "title": "Architettura MVC",
+                "description": "Struttura del codice pulita e mantenibile seguendo pattern standard dell'industria."
+            },
+            "css": {
+                "title": "CSS Moderno",
+                "description": "Design responsive con CSS Grid, Flexbox e sistemi di design."
+            },
+            "testing": {
+                "title": "Framework di Testing",
+                "description": "PHPUnit 11 con copertura di test completa e integrazione continua."
+            }
+        },
+        "cta": {
+            "title": "Pronto a Iniziare il Tuo Progetto?",
+            "subtitle": "Discutiamo di come possiamo aiutarti a dare vita alla tua visione con i nostri servizi professionali di sviluppo web.",
+            "start_button": "Inizia Oggi",
+            "learn_more_button": "Scopri di Più Su di Noi"
+        }
+    },
+    "contact": {
+        "title": "Contatto",
+        "meta_description": "Mettiti in contatto con noi. Ci piacerebbe sentirti e discutere le esigenze del tuo progetto.",
+        "header": {
+            "title": "Mettiti in Contatto",
+            "subtitle": "Ci piacerebbe sentirti. Inviaci un messaggio e ti risponderemo il prima possibile."
+        },
+        "info": {
+            "title": "Informazioni di Contatto",
+            "address": {
+                "title": "Indirizzo",
+                "value": "123 Via Sviluppo Web<br>Tech City, TC 12345"
+            },
+            "phone": {
+                "title": "Telefono",
+                "value": "(555) 123-4567"
+            },
+            "email": {
+                "title": "Email",
+                "value": "hello@samplesite.com"
+            },
+            "hours": {
+                "title": "Orari",
+                "value": "Lunedì - Venerdì<br>9:00 - 18:00"
+            }
+        },
+        "form": {
+            "title": "Inviaci un Messaggio",
+            "name_label": "Nome Completo *",
+            "name_placeholder": "Inserisci il tuo nome completo",
+            "email_label": "Indirizzo Email *",
+            "email_placeholder": "Inserisci il tuo indirizzo email",
+            "message_label": "Messaggio *",
+            "message_placeholder": "Raccontaci del tuo progetto o facci una domanda...",
+            "submit_button": "Invia Messaggio",
+            "disclaimer": "* Campi obbligatori. Rispettiamo la tua privacy e non condivideremo mai le tue informazioni."
+        },
+        "validation": {
+            "name_required": "Il nome è obbligatorio",
+            "name_min_length": "Il nome deve essere di almeno {min} caratteri",
+            "name_max_length": "Il nome non deve superare {max} caratteri",
+            "email_required": "L'email è obbligatoria",
+            "email_invalid": "Per favore inserisci un indirizzo email valido",
+            "email_max_length": "L'email non deve superare {max} caratteri",
+            "message_required": "Il messaggio è obbligatorio",
+            "message_min_length": "Il messaggio deve essere di almeno {min} caratteri",
+            "message_max_length": "Il messaggio non deve superare {max} caratteri"
+        },
+        "success": {
+            "title": "Messaggio Inviato",
+            "message": "Grazie per il tuo messaggio, {name}. Ti risponderemo presto!"
+        },
+        "error": {
+            "security_title": "Errore di Sicurezza",
+            "invalid_token": "Token di sicurezza non valido. Per favore riprova.",
+            "processing_title": "Errore di Elaborazione",
+            "processing_failed": "Elaborazione del tuo messaggio fallita. Per favore riprova più tardi."
+        }
+    },
+    "blog": {
+        "title": "Blog",
+        "meta_description": "Approfondimenti, tutorial e riflessioni sullo sviluppo web moderno, best practice PHP e le ultime tecnologie.",
+        "header": {
+            "title": "Il Nostro Blog",
+            "subtitle": "Approfondimenti, tutorial e riflessioni sullo sviluppo web moderno, best practice PHP e le ultime tecnologie."
+        },
+        "empty": {
+            "title": "Prossimamente",
+            "description": "Stiamo lavorando su alcuni interessanti post del blog sullo sviluppo PHP moderno, architettura MVC e best practice di sviluppo web.",
+            "button": "Ricevi Notifiche"
+        },
+        "post": {
+            "read_more": "Leggi di Più",
+            "by_author": "da {author}",
+            "published_on": "Pubblicato il {date}"
+        },
+        "pagination": {
+            "previous": "← Precedente",
+            "next": "Successivo →"
+        },
+        "topics": {
+            "title": "Argomenti in Evidenza",
+            "subtitle": "Esplora la nostra competenza nello sviluppo web moderno",
+            "php_features": {
+                "title": "Funzionalità PHP 8.4",
+                "description": "Esplorando le ultime funzionalità PHP inclusi tipizzazione rigorosa, attributi e miglioramenti delle performance."
+            },
+            "mvc_architecture": {
+                "title": "Architettura MVC",
+                "description": "Approfondimenti sui pattern di architettura pulita, dependency injection e principi SOLID."
+            },
+            "testing": {
+                "title": "Best Practice di Testing",
+                "description": "Guide complete su PHPUnit, sviluppo test-driven e strategie di garanzia della qualità."
+            }
+        },
+        "newsletter": {
+            "title": "Rimani Aggiornato",
+            "description": "Iscriviti alla nostra newsletter per gli ultimi approfondimenti sullo sviluppo web, best practice PHP e trend tecnologici.",
+            "placeholder": "Inserisci la tua email",
+            "button": "Iscriviti"
+        }
+    }
+}

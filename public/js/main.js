@@ -27,6 +27,154 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
+    // Language selector functionality
+    const languageButton = document.getElementById('language-button');
+    const languageDropdown = document.getElementById('language-dropdown');
+    
+    if (languageButton && languageDropdown) {
+        let isDropdownOpen = false;
+        
+        // Toggle dropdown on button click
+        languageButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            toggleLanguageDropdown();
+        });
+        
+        // Handle language selection
+        languageDropdown.addEventListener('click', (e) => {
+            const languageOption = e.target.closest('.language-option');
+            if (languageOption && !languageOption.classList.contains('active')) {
+                e.preventDefault();
+                const locale = languageOption.dataset.locale;
+                switchLanguage(locale, languageOption.href);
+            }
+        });
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!languageButton.contains(e.target) && !languageDropdown.contains(e.target)) {
+                closeLanguageDropdown();
+            }
+        });
+        
+        // Handle keyboard navigation
+        languageButton.addEventListener('keydown', (e) => {
+            switch (e.key) {
+                case 'Enter':
+                case ' ':
+                    e.preventDefault();
+                    toggleLanguageDropdown();
+                    break;
+                case 'ArrowDown':
+                    e.preventDefault();
+                    openLanguageDropdown();
+                    focusFirstLanguageOption();
+                    break;
+                case 'Escape':
+                    closeLanguageDropdown();
+                    break;
+            }
+        });
+        
+        languageDropdown.addEventListener('keydown', (e) => {
+            const options = languageDropdown.querySelectorAll('.language-option');
+            const currentIndex = Array.from(options).indexOf(document.activeElement);
+            
+            switch (e.key) {
+                case 'ArrowDown':
+                    e.preventDefault();
+                    const nextIndex = currentIndex < options.length - 1 ? currentIndex + 1 : 0;
+                    options[nextIndex].focus();
+                    break;
+                case 'ArrowUp':
+                    e.preventDefault();
+                    const prevIndex = currentIndex > 0 ? currentIndex - 1 : options.length - 1;
+                    options[prevIndex].focus();
+                    break;
+                case 'Enter':
+                    e.preventDefault();
+                    if (document.activeElement.classList.contains('language-option')) {
+                        const locale = document.activeElement.dataset.locale;
+                        switchLanguage(locale, document.activeElement.href);
+                    }
+                    break;
+                case 'Escape':
+                    closeLanguageDropdown();
+                    languageButton.focus();
+                    break;
+            }
+        });
+        
+        function toggleLanguageDropdown() {
+            if (isDropdownOpen) {
+                closeLanguageDropdown();
+            } else {
+                openLanguageDropdown();
+            }
+        }
+        
+        function openLanguageDropdown() {
+            languageDropdown.classList.add('show');
+            languageButton.setAttribute('aria-expanded', 'true');
+            isDropdownOpen = true;
+        }
+        
+        function closeLanguageDropdown() {
+            languageDropdown.classList.remove('show');
+            languageButton.setAttribute('aria-expanded', 'false');
+            isDropdownOpen = false;
+        }
+        
+        function focusFirstLanguageOption() {
+            const firstOption = languageDropdown.querySelector('.language-option');
+            if (firstOption) {
+                firstOption.focus();
+            }
+        }
+        
+        function switchLanguage(locale, fallbackUrl) {
+            // Show loading state
+            const currentLanguageSpan = languageButton.querySelector('.current-language');
+            const originalText = currentLanguageSpan.textContent;
+            currentLanguageSpan.textContent = '...';
+            
+            // Make AJAX request if fetch is available
+            if (typeof fetch !== 'undefined') {
+                fetch(`/language/switch/${locale}`, {
+                    method: 'GET',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success && data.redirect_url) {
+                        // Update current language display
+                        currentLanguageSpan.textContent = locale.toUpperCase();
+                        
+                        // Close dropdown
+                        closeLanguageDropdown();
+                        
+                        // Redirect to the new URL
+                        window.location.href = data.redirect_url;
+                    } else {
+                        throw new Error('Language switch failed');
+                    }
+                })
+                .catch(error => {
+                    console.warn('AJAX language switch failed, falling back to page navigation:', error);
+                    currentLanguageSpan.textContent = originalText;
+                    window.location.href = fallbackUrl;
+                });
+            } else {
+                // Fallback to direct navigation
+                window.location.href = fallbackUrl;
+            }
+        }
+    }
+
     // Smooth scrolling for anchor links
     document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         anchor.addEventListener('click', function (e) {

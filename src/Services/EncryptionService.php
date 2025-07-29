@@ -3,14 +3,17 @@ declare(strict_types=1);
 
 namespace App\Services;
 
+use App\Interfaces\EncryptionInterface;
+
 /**
- * Class Encryption
+ * Class EncryptionService
  *
  * This class provides methods to encrypt and decrypt data using the Sodium library.
+ * PHP 8.4 compatible with comprehensive EncryptionInterface implementation.
  *
  * @package App\Services
  */
-class EncryptionService
+class EncryptionService implements EncryptionInterface
 {
     /**
      * @var string The encryption key.
@@ -68,5 +71,104 @@ class EncryptionService
         }
         
         return $plainText;
+    }
+
+    /**
+     * Generate a new encryption key.
+     */
+    public function generateKey(): string
+    {
+        return base64_encode(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));
+    }
+
+    /**
+     * Encrypt an array or object.
+     */
+    public function encryptData(mixed $data): string
+    {
+        $serialized = serialize($data);
+        return $this->encrypt($serialized);
+    }
+
+    /**
+     * Decrypt and unserialize data.
+     */
+    public function decryptData(string $encryptedData): mixed
+    {
+        $decrypted = $this->decrypt($encryptedData);
+        return unserialize($decrypted);
+    }
+
+    /**
+     * Check if a value can be decrypted (is valid encrypted data).
+     */
+    public function canDecrypt(string $value): bool
+    {
+        try {
+            $this->decrypt($value);
+            return true;
+        } catch (\Exception) {
+            return false;
+        }
+    }
+
+    /**
+     * Get the encryption algorithm being used.
+     */
+    public function getAlgorithm(): string
+    {
+        return 'XSalsa20-Poly1305';
+    }
+
+    /**
+     * Get the key size in bytes.
+     */
+    public function getKeySize(): int
+    {
+        return SODIUM_CRYPTO_SECRETBOX_KEYBYTES;
+    }
+
+    /**
+     * Encrypt a file.
+     */
+    public function encryptFile(string $inputPath, string $outputPath): bool
+    {
+        if (!file_exists($inputPath)) {
+            throw new \Exception('Input file does not exist');
+        }
+
+        $content = file_get_contents($inputPath);
+        if ($content === false) {
+            throw new \Exception('Cannot read input file');
+        }
+
+        $encrypted = $this->encrypt($content);
+        return file_put_contents($outputPath, $encrypted) !== false;
+    }
+
+    /**
+     * Decrypt a file.
+     */
+    public function decryptFile(string $inputPath, string $outputPath): bool
+    {
+        if (!file_exists($inputPath)) {
+            throw new \Exception('Input file does not exist');
+        }
+
+        $content = file_get_contents($inputPath);
+        if ($content === false) {
+            throw new \Exception('Cannot read input file');
+        }
+
+        $decrypted = $this->decrypt($content);
+        return file_put_contents($outputPath, $decrypted) !== false;
+    }
+
+    /**
+     * Generate a secure hash of the encryption key for verification.
+     */
+    public function getKeyHash(): string
+    {
+        return hash('sha256', $this->key);
     }
 }

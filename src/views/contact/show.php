@@ -2,8 +2,8 @@
     <div class="contact-page">
         <!-- Contact Header -->
         <div class="contact-header text-center mb-8">
-            <h1>Get In Touch</h1>
-            <p class="section-subtitle">We'd love to hear from you. Send us a message and we'll respond as soon as possible.</p>
+            <h1><?= trans('pages.contact.header.title') ?></h1>
+            <p class="section-subtitle"><?= trans('pages.contact.header.subtitle') ?></p>
         </div>
 
         <div class="contact-content">
@@ -11,7 +11,7 @@
             <div class="contact-info">
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="mb-6">Contact Information</h3>
+                        <h3 class="mb-6"><?= trans('pages.contact.info.title') ?></h3>
                         
                         <div class="contact-item">
                             <div class="contact-icon">
@@ -21,8 +21,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4>Address</h4>
-                                <p>123 Web Development St.<br>Tech City, TC 12345</p>
+                                <h4><?= trans('pages.contact.info.address.title') ?></h4>
+                                <p><?= trans('pages.contact.info.address.value') ?></p>
                             </div>
                         </div>
                         
@@ -33,8 +33,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4>Phone</h4>
-                                <p>(555) 123-4567</p>
+                                <h4><?= trans('pages.contact.info.phone.title') ?></h4>
+                                <p><?= trans('pages.contact.info.phone.value') ?></p>
                             </div>
                         </div>
                         
@@ -46,8 +46,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4>Email</h4>
-                                <p>hello@samplesite.com</p>
+                                <h4><?= trans('pages.contact.info.email.title') ?></h4>
+                                <p><?= trans('pages.contact.info.email.value') ?></p>
                             </div>
                         </div>
                         
@@ -59,8 +59,8 @@
                                 </svg>
                             </div>
                             <div>
-                                <h4>Hours</h4>
-                                <p>Monday - Friday<br>9:00 AM - 6:00 PM</p>
+                                <h4><?= trans('pages.contact.info.hours.title') ?></h4>
+                                <p><?= trans('pages.contact.info.hours.value') ?></p>
                             </div>
                         </div>
                     </div>
@@ -71,13 +71,13 @@
             <div class="contact-form-section">
                 <div class="card">
                     <div class="card-body">
-                        <h3 class="mb-6">Send us a Message</h3>
+                        <h3 class="mb-6"><?= trans('pages.contact.form.title') ?></h3>
                         
                         <form method="post" action="/contact/submit" class="contact-form" novalidate>
                             <input type="hidden" name="csrf_token" value="<?= htmlspecialchars($csrf_token ?? '') ?>">
                             
                             <div class="form-group">
-                                <label for="name" class="form-label">Full Name *</label>
+                                <label for="name" class="form-label"><?= trans('pages.contact.form.name_label') ?></label>
                                 <input 
                                     type="text" 
                                     id="name" 
@@ -85,7 +85,7 @@
                                     class="form-input <?= isset($errors['name']) ? 'error' : '' ?>" 
                                     value="<?= htmlspecialchars($old['name'] ?? '') ?>" 
                                     required
-                                    placeholder="Enter your full name"
+                                    placeholder="<?= trans('pages.contact.form.name_placeholder') ?>"
                                 >
                                 <?php if (isset($errors['name'])): ?>
                                     <span class="form-error"><?= htmlspecialchars($errors['name']) ?></span>
@@ -93,7 +93,7 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="email" class="form-label">Email Address *</label>
+                                <label for="email" class="form-label"><?= trans('pages.contact.form.email_label') ?></label>
                                 <input 
                                     type="email" 
                                     id="email" 
@@ -101,7 +101,7 @@
                                     class="form-input <?= isset($errors['email']) ? 'error' : '' ?>" 
                                     value="<?= htmlspecialchars($old['email'] ?? '') ?>" 
                                     required
-                                    placeholder="Enter your email address"
+                                    placeholder="<?= trans('pages.contact.form.email_placeholder') ?>"
                                 >
                                 <?php if (isset($errors['email'])): ?>
                                     <span class="form-error"><?= htmlspecialchars($errors['email']) ?></span>
@@ -109,13 +109,13 @@
                             </div>
                             
                             <div class="form-group">
-                                <label for="message" class="form-label">Message *</label>
+                                <label for="message" class="form-label"><?= trans('pages.contact.form.message_label') ?></label>
                                 <textarea 
                                     id="message" 
                                     name="message" 
                                     class="form-input form-textarea <?= isset($errors['message']) ? 'error' : '' ?>" 
                                     required
-                                    placeholder="Tell us about your project or ask us a question..."
+                                    placeholder="<?= trans('pages.contact.form.message_placeholder') ?>"
                                 ><?= htmlspecialchars($old['message'] ?? '') ?></textarea>
                                 <?php if (isset($errors['message'])): ?>
                                     <span class="form-error"><?= htmlspecialchars($errors['message']) ?></span>
@@ -128,12 +128,12 @@
                                         <line x1="22" y1="2" x2="11" y2="13"/>
                                         <polygon points="22,2 15,22 11,13 2,9 22,2"/>
                                     </svg>
-                                    Send Message
+                                    <?= trans('pages.contact.form.submit_button') ?>
                                 </button>
                             </div>
                             
                             <p class="form-disclaimer">
-                                * Required fields. We respect your privacy and will never share your information.
+                                <?= trans('pages.contact.form.disclaimer') ?>
                             </p>
                         </form>
                     </div>
