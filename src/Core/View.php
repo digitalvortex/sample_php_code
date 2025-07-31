@@ -32,13 +32,8 @@ class View
             throw new \RuntimeException("Template file not found: {$templatePath}");
         }
 
-        // Extract the remaining data so that variables are available in the view
-        extract($data);
-
-        // Render the view (the partial)
-        ob_start();
-        include $templatePath;
-        $content = ob_get_clean();
+        // Render the view (the partial) with secure variable passing
+        $content = self::renderTemplate($templatePath, $data);
 
         if ($content === false) {
             throw new \RuntimeException("Failed to render template: {$template}");
@@ -60,15 +55,43 @@ class View
         $params = $data;
         $params['content'] = $content;
 
-        // Render the layout
-        ob_start();
-        include $layoutPath;
-        $layoutContent = ob_get_clean();
+        // Render the layout with secure template rendering
+        $layoutContent = self::renderTemplate($layoutPath, $params);
 
         if ($layoutContent === false) {
             throw new \RuntimeException("Failed to render layout");
         }
 
         return $layoutContent;
+    }
+    
+    /**
+     * Safely render a template file with data without using extract().
+     * 
+     * @param string $templatePath Full path to template file
+     * @param array<string, mixed> $data Data to make available in template
+     * @return string Rendered content
+     */
+    private static function renderTemplate(string $templatePath, array $data): string
+    {
+        // Create a closure to isolate template execution scope
+        $renderClosure = function (string $__templatePath, array $__data) {
+            // Make data available as individual variables in a controlled way
+            // We use prefixed variable names to avoid conflicts
+            foreach ($__data as $__key => $__value) {
+                // Validate variable name to prevent issues
+                if (is_string($__key) && preg_match('/^[a-zA-Z_][a-zA-Z0-9_]*$/', $__key)) {
+                    $$__key = $__value;
+                }
+            }
+            
+            // Start output buffering and include template
+            ob_start();
+            include $__templatePath;
+            return ob_get_clean();
+        };
+        
+        $result = $renderClosure($templatePath, $data);
+        return $result !== false ? $result : '';
     }
 }

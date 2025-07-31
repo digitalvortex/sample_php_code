@@ -8,6 +8,8 @@ use App\Models\User;
 use App\Models\Level;
 use App\Models\Blog;
 use App\Models\Session;
+use App\Models\Contact;
+use App\Models\ApiKey;
 use App\Services\EncryptionService;
 use PDO;
 
@@ -31,6 +33,14 @@ class ModelsDefinitions
             Session::class => function (Container $c) {
                 Session::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
                 return new Session();
+            },
+            Contact::class => function (Container $c) {
+                Contact::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new Contact();
+            },
+            ApiKey::class => function (Container $c) {
+                ApiKey::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new ApiKey();
             },
         ];
     }

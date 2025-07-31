@@ -12,6 +12,7 @@ class User extends Base
 {
     protected static string $table = 'users';
     
+    /** @var array<string> */
     protected static array $fillable = [
         'username',
         'email',
@@ -23,12 +24,14 @@ class User extends Base
         'deleted_at'
     ];
     
+    /** @var array<string> */
     protected static array $encrypted = [
         'email',
         'first_name',
         'last_name'
     ];
     
+    /** @var array<string> */
     protected static array $hidden = [
         'password'
     ];
@@ -36,7 +39,7 @@ class User extends Base
     /**
      * Create a new user with password hashing
      *
-     * @param array $userData The user data to create
+     * @param array<string, mixed> $userData The user data to create
      * @return static Returns the newly created user instance
      */
     public static function createUser(array $userData): static
@@ -63,7 +66,7 @@ class User extends Base
     /**
      * Update user data with password hashing.
      * 
-     * @param array $data The user data to update.
+     * @param array<string, mixed> $data The user data to update.
      * @return bool Returns true on success, false on failure.
      */
     public function updateUser(array $data): bool
@@ -100,13 +103,15 @@ class User extends Base
     }
 
     /**
-     * Find all deleted users.
+     * Find all deleted users with SQL injection protection.
      * 
      * @return array<static> Returns an array of deleted users.
      */
     public static function findDeleted(): array
     {
-        $sql = "SELECT * FROM " . static::getTableName() . " WHERE deleted_at IS NOT NULL";
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $deletedAtField = self::escapeIdentifier('deleted_at');
+        $sql = "SELECT * FROM {$tableName} WHERE {$deletedAtField} IS NOT NULL";
         $stmt = static::$pdo->prepare($sql);
         $stmt->execute();
         $results = $stmt->fetchAll(\PDO::FETCH_ASSOC);
@@ -120,7 +125,7 @@ class User extends Base
     }
 
     /**
-     * Soft delete the user.
+     * Soft delete the user with SQL injection protection.
      * 
      * @return bool Returns true on success, false on failure.
      */
@@ -130,7 +135,10 @@ class User extends Base
             return false;
         }
         
-        $sql = "UPDATE " . static::getTableName() . " SET deleted_at = :deleted_at WHERE " . static::$primaryKey . " = :id";
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $deletedAtField = self::escapeIdentifier('deleted_at');
+        $primaryKeyField = self::escapeIdentifier(static::$primaryKey);
+        $sql = "UPDATE {$tableName} SET {$deletedAtField} = :deleted_at WHERE {$primaryKeyField} = :id";
         $stmt = static::$pdo->prepare($sql);
         $result = $stmt->execute([
             ':id' => $this->getId(), 

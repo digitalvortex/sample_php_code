@@ -18,15 +18,50 @@ abstract class Base implements ModelInterface
     protected static PDO $pdo;
     protected static EncryptionService $encryptionService;
     protected static string $table = '';
+    
+    /** @var array<string> */
     protected static array $fillable = [];
+    
+    /** @var array<string> */
     protected static array $encrypted = [];
+    
+    /** @var array<string> */
     protected static array $hidden = [];
+    
     protected static string $primaryKey = 'id';
     
+    /**
+     * @var array<string> Allowed table names for security validation
+     */
+    private static array $allowedTables = [
+        'users',
+        'blogs', 
+        'contacts',
+        'sessions',
+        'levels',
+        'api_keys'
+    ];
+    
+    /**
+     * @var array<string> Allowed operators for WHERE clauses
+     */
+    private static array $allowedOperators = [
+        '=', '!=', '<>', '<', '>', '<=', '>=', 
+        'LIKE', 'NOT LIKE', 'IN', 'NOT IN',
+        'IS NULL', 'IS NOT NULL'
+    ];
+    
+    /** @var array<string, mixed> */
     protected array $attributes = [];
+    
+    /** @var array<string, mixed> */
     protected array $original = [];
+    
     protected bool $exists = false;
 
+    /**
+     * @param array<string, mixed> $attributes
+     */
     public function __construct(array $attributes = [])
     {
         $this->fill($attributes);
@@ -43,6 +78,9 @@ abstract class Base implements ModelInterface
     
     /**
      * Fill model with data.
+     *
+     * @param array<string, mixed> $attributes
+     * @return static
      */
     public function fill(array $attributes): static
     {
@@ -56,9 +94,13 @@ abstract class Base implements ModelInterface
 
     /**
      * Create a new record.
+     *
+     * @param array<string, mixed> $data
+     * @return static
      */
     public static function create(array $data): static
     {
+        /** @phpstan-ignore-next-line */
         $instance = new static($data);
         $instance->save();
         return $instance;
@@ -77,7 +119,7 @@ abstract class Base implements ModelInterface
     }
     
     /**
-     * Perform insert operation.
+     * Perform insert operation with SQL injection protection.
      */
     protected function performInsert(): bool
     {
@@ -90,10 +132,15 @@ abstract class Base implements ModelInterface
             }
         }
 
-        $columns = implode(', ', array_keys($fields));
+        // Validate and escape field names
+        $fieldNames = array_keys($fields);
+        $escapedColumns = self::validateAndEscapeFields($fieldNames);
+        $columns = implode(', ', $escapedColumns);
         $values = implode(', ', array_fill(0, count($fields), '?'));
 
-        $sql = "INSERT INTO " . static::getTableName() . " ($columns) VALUES ($values)";
+        // Use validated table name and escaped column names
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $sql = "INSERT INTO {$tableName} ({$columns}) VALUES ({$values})";
         $stmt = static::$pdo->prepare($sql);
         
         if ($stmt->execute(array_values($fields))) {
@@ -107,11 +154,15 @@ abstract class Base implements ModelInterface
     }
 
     /**
-     * Find a record by ID.
+     * Find a record by ID with SQL injection protection.
      */
     public static function find(mixed $id): ?static
     {
-        $stmt = static::$pdo->prepare("SELECT * FROM " . static::getTableName() . " WHERE " . static::$primaryKey . " = ?");
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $primaryKey = self::escapeIdentifier(static::$primaryKey);
+        
+        $sql = "SELECT * FROM {$tableName} WHERE {$primaryKey} = ?";
+        $stmt = static::$pdo->prepare($sql);
         $stmt->execute([$id]);
         $result = $stmt->fetch(PDO::FETCH_ASSOC);
 
@@ -138,6 +189,9 @@ abstract class Base implements ModelInterface
 
     /**
      * Update the model with new data.
+     *
+     * @param array<string, mixed> $data
+     * @return bool
      */
     public function update(array $data): bool
     {
@@ -146,7 +200,7 @@ abstract class Base implements ModelInterface
     }
     
     /**
-     * Perform update operation.
+     * Perform update operation with SQL injection protection.
      */
     protected function performUpdate(): bool
     {
@@ -154,6 +208,14 @@ abstract class Base implements ModelInterface
         
         if (empty($dirty)) {
             return true; // No changes to update
+        }
+        
+        // Validate field names
+        $fieldNames = array_keys($dirty);
+        foreach ($fieldNames as $field) {
+            if (!self::isValidFieldName($field)) {
+                throw new \InvalidArgumentException("Invalid field name for update: " . $field);
+            }
         }
         
         // Encrypt fields that should be encrypted
@@ -164,19 +226,25 @@ abstract class Base implements ModelInterface
         }
 
         $setClause = [];
-        $params = [':' . static::$primaryKey => $this->getId()];
+        $primaryKeyParam = ':' . static::$primaryKey;
+        $params = [$primaryKeyParam => $this->getId()];
 
         foreach ($dirty as $field => $value) {
-            $setClause[] = "$field = :$field";
-            $params[":$field"] = $value;
+            $escapedField = self::escapeIdentifier($field);
+            $paramName = ":$field";
+            $setClause[] = "$escapedField = $paramName";
+            $params[$paramName] = $value;
         }
 
         // Add updated_at timestamp if it exists in fillable
         if (in_array('updated_at', static::$fillable)) {
-            $setClause[] = "updated_at = CURRENT_TIMESTAMP";
+            $updatedAtField = self::escapeIdentifier('updated_at');
+            $setClause[] = "$updatedAtField = CURRENT_TIMESTAMP";
         }
 
-        $sql = "UPDATE " . static::getTableName() . " SET " . implode(', ', $setClause) . " WHERE " . static::$primaryKey . " = :" . static::$primaryKey;
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $primaryKeyField = self::escapeIdentifier(static::$primaryKey);
+        $sql = "UPDATE {$tableName} SET " . implode(', ', $setClause) . " WHERE {$primaryKeyField} = {$primaryKeyParam}";
         $stmt = static::$pdo->prepare($sql);
         
         $result = $stmt->execute($params);
@@ -189,7 +257,7 @@ abstract class Base implements ModelInterface
     }
 
     /**
-     * Delete the model from the database.
+     * Delete the model from the database with SQL injection protection.
      */
     public function delete(): bool
     {
@@ -197,7 +265,9 @@ abstract class Base implements ModelInterface
             return false;
         }
         
-        $sql = "DELETE FROM " . static::getTableName() . " WHERE " . static::$primaryKey . " = :id";
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $primaryKeyField = self::escapeIdentifier(static::$primaryKey);
+        $sql = "DELETE FROM {$tableName} WHERE {$primaryKeyField} = :id";
         $stmt = static::$pdo->prepare($sql);
         $result = $stmt->execute([':id' => $this->getId()]);
         
@@ -209,11 +279,16 @@ abstract class Base implements ModelInterface
     }
 
     /**
-     * Get all records.
+     * Get all records with SQL injection protection.
+     *
+     * @return array<static>
      */
     public static function all(): array
     {
-        $stmt = static::$pdo->query("SELECT * FROM " . static::getTableName());
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $sql = "SELECT * FROM {$tableName}";
+        $stmt = static::$pdo->prepare($sql);
+        $stmt->execute();
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
 
         $models = [];
@@ -225,7 +300,11 @@ abstract class Base implements ModelInterface
     }
 
     /**
-     * Find records matching criteria.
+     * Find records matching criteria with SQL injection protection.
+     *
+     * @param array<string, mixed> $criteria
+     * @return array<static>
+     * @throws \InvalidArgumentException If field names are invalid
      */
     public static function findBy(array $criteria): array
     {
@@ -233,11 +312,19 @@ abstract class Base implements ModelInterface
         $params = [];
         
         foreach ($criteria as $field => $value) {
-            $whereClause[] = "$field = :$field";
-            $params[":$field"] = $value;
+            // Validate field name
+            if (!self::isValidFieldName($field)) {
+                throw new \InvalidArgumentException("Invalid field name in criteria: " . $field);
+            }
+            
+            $escapedField = self::escapeIdentifier($field);
+            $paramName = ":$field";
+            $whereClause[] = "$escapedField = $paramName";
+            $params[$paramName] = $value;
         }
         
-        $sql = "SELECT * FROM " . static::getTableName() . " WHERE " . implode(' AND ', $whereClause);
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $sql = "SELECT * FROM {$tableName} WHERE " . implode(' AND ', $whereClause);
         $stmt = static::$pdo->prepare($sql);
         $stmt->execute($params);
         $results = $stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -252,6 +339,9 @@ abstract class Base implements ModelInterface
     
     /**
      * Find first record matching criteria.
+     *
+     * @param array<string, mixed> $criteria
+     * @return static|null
      */
     public static function findOneBy(array $criteria): ?static
     {
@@ -260,11 +350,14 @@ abstract class Base implements ModelInterface
     }
 
     /**
-     * Count total records
+     * Count total records with SQL injection protection.
      */
     public static function count(): int
     {
-        $stmt = static::$pdo->query("SELECT COUNT(*) FROM " . static::getTableName());
+        $tableName = self::escapeIdentifier(static::getTableName());
+        $sql = "SELECT COUNT(*) FROM {$tableName}";
+        $stmt = static::$pdo->prepare($sql);
+        $stmt->execute();
         return (int) $stmt->fetchColumn();
     }
     
@@ -277,11 +370,111 @@ abstract class Base implements ModelInterface
     }
     
     /**
-     * Get the table name for this model.
+     * Get the table name for this model with security validation.
+     * 
+     * @throws \RuntimeException If table name is not in allowlist
      */
     public static function getTableName(): string
     {
-        return static::$table;
+        $tableName = static::$table;
+        
+        if (!self::isValidTableName($tableName)) {
+            throw new \RuntimeException("Invalid or unauthorized table name: " . $tableName);
+        }
+        
+        return $tableName;
+    }
+    
+    /**
+     * Validate table name against security allowlist.
+     * 
+     * @param string $tableName Table name to validate
+     * @return bool True if table name is allowed
+     */
+    private static function isValidTableName(string $tableName): bool
+    {
+        return in_array($tableName, self::$allowedTables, true);
+    }
+    
+    /**
+     * Validate field name against model schema.
+     * 
+     * @param string $fieldName Field name to validate
+     * @return bool True if field name is valid
+     */
+    protected static function isValidFieldName(string $fieldName): bool
+    {
+        // Allow primary key
+        if ($fieldName === static::$primaryKey) {
+            return true;
+        }
+        
+        // Allow fillable fields
+        if (in_array($fieldName, static::$fillable, true)) {
+            return true;
+        }
+        
+        // Allow encrypted fields
+        if (in_array($fieldName, static::$encrypted, true)) {
+            return true;
+        }
+        
+        // Allow hidden fields
+        if (in_array($fieldName, static::$hidden, true)) {
+            return true;
+        }
+        
+        // Allow common timestamp fields
+        if (in_array($fieldName, ['created_at', 'updated_at', 'deleted_at'], true)) {
+            return true;
+        }
+        
+        return false;
+    }
+    
+    /**
+     * Escape SQL identifier (table or column name).
+     * 
+     * @param string $identifier SQL identifier to escape
+     * @return string Escaped identifier
+     */
+    protected static function escapeIdentifier(string $identifier): string
+    {
+        // Remove any existing backticks and escape with backticks
+        $clean = str_replace('`', '', $identifier);
+        return "`{$clean}`";
+    }
+    
+    /**
+     * Validate and escape field names for SQL queries.
+     * 
+     * @param array<string> $fields Field names to validate
+     * @return array<string> Validated and escaped field names
+     * @throws \InvalidArgumentException If any field name is invalid
+     */
+    protected static function validateAndEscapeFields(array $fields): array
+    {
+        $escapedFields = [];
+        
+        foreach ($fields as $field) {
+            if (!self::isValidFieldName($field)) {
+                throw new \InvalidArgumentException("Invalid field name: " . $field);
+            }
+            $escapedFields[] = self::escapeIdentifier($field);
+        }
+        
+        return $escapedFields;
+    }
+    
+    /**
+     * Validate SQL operator.
+     * 
+     * @param string $operator SQL operator to validate
+     * @return bool True if operator is allowed
+     */
+    protected static function isValidOperator(string $operator): bool
+    {
+        return in_array(strtoupper($operator), self::$allowedOperators, true);
     }
     
     /**
@@ -294,6 +487,8 @@ abstract class Base implements ModelInterface
     
     /**
      * Get fillable attributes.
+     *
+     * @return array<string>
      */
     public static function getFillable(): array
     {
@@ -302,6 +497,8 @@ abstract class Base implements ModelInterface
     
     /**
      * Get hidden attributes.
+     *
+     * @return array<string>
      */
     public static function getHidden(): array
     {
@@ -310,6 +507,8 @@ abstract class Base implements ModelInterface
     
     /**
      * Convert model to array.
+     *
+     * @return array<string, mixed>
      */
     public function toArray(): array
     {
@@ -328,7 +527,8 @@ abstract class Base implements ModelInterface
      */
     public function toJson(): string
     {
-        return json_encode($this->toArray());
+        $json = json_encode($this->toArray());
+        return $json !== false ? $json : '{}';
     }
     
     /**
@@ -370,9 +570,13 @@ abstract class Base implements ModelInterface
     
     /**
      * Create new instance from database attributes.
+     *
+     * @param array<string, mixed> $attributes
+     * @return static
      */
     protected static function newFromAttributes(array $attributes): static
     {
+        /** @phpstan-ignore-next-line */
         $instance = new static();
         $instance->attributes = $attributes;
         $instance->original = $attributes;
@@ -383,6 +587,9 @@ abstract class Base implements ModelInterface
     
     /**
      * Decrypt encrypted attributes.
+     *
+     * @param array<string, mixed> $attributes
+     * @return array<string, mixed>
      */
     protected static function decryptAttributes(array $attributes): array
     {
@@ -397,6 +604,8 @@ abstract class Base implements ModelInterface
     
     /**
      * Get dirty attributes (changed since last sync).
+     *
+     * @return array<string, mixed>
      */
     protected function getDirty(): array
     {

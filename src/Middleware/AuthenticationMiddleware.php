@@ -7,15 +7,23 @@ namespace App\Middleware;
 use App\Interfaces\MiddlewareInterface;
 use App\Interfaces\RequestInterface;
 use App\Interfaces\ResponseInterface;
+use App\Services\JwtService;
+use App\Services\SecurityLoggerService;
+use App\Models\ApiKey;
+use App\Models\User;
 
 /**
  * Authentication Middleware
  * 
  * Ensures users are authenticated before accessing protected routes.
- * PHP 8.4 compatible with strict typing.
+ * Supports session, JWT token, and API key authentication.
+ * PHP 8.4 compatible with strict typing and comprehensive security.
  */
 class AuthenticationMiddleware implements MiddlewareInterface
 {
+    private JwtService $jwtService;
+    private SecurityLoggerService $securityLogger;
+
     /**
      * @var array<string> Routes that don't require authentication
      */
@@ -29,6 +37,12 @@ class AuthenticationMiddleware implements MiddlewareInterface
         '/register',
         '/password-reset'
     ];
+
+    public function __construct(JwtService $jwtService, SecurityLoggerService $securityLogger)
+    {
+        $this->jwtService = $jwtService;
+        $this->securityLogger = $securityLogger;
+    }
 
     public function handle(RequestInterface $request, callable $next): ResponseInterface
     {
@@ -92,8 +106,17 @@ class AuthenticationMiddleware implements MiddlewareInterface
      */
     private function checkAuthentication(RequestInterface $request): bool
     {
-        // Check session-based authentication
-        if (session_status() === PHP_SESSION_ACTIVE && isset($_SESSION['user_id'])) {
+        $ipAddress = $request->getClientIp();
+        $userAgent = $request->getUserAgent();
+
+        // Check session-based authentication with security validation
+        if ($this->validateSession($request)) {
+            $this->securityLogger->logAuthSuccess(
+                $_SESSION['user_id'], 
+                'session', 
+                $ipAddress, 
+                $userAgent
+            );
             return true;
         }
 
@@ -101,13 +124,49 @@ class AuthenticationMiddleware implements MiddlewareInterface
         $authHeader = $request->getHeader('Authorization');
         if ($authHeader && str_starts_with($authHeader, 'Bearer ')) {
             $token = substr($authHeader, 7);
-            return $this->validateJwtToken($token);
+            $result = $this->validateJwtToken($token);
+            
+            if ($result) {
+                $this->securityLogger->logAuthSuccess(
+                    $result['user_id'], 
+                    'jwt', 
+                    $ipAddress, 
+                    $userAgent
+                );
+                return true;
+            } else {
+                $this->securityLogger->logAuthFailure(
+                    'jwt', 
+                    'token', 
+                    'invalid_token', 
+                    $ipAddress, 
+                    $userAgent
+                );
+            }
         }
 
         // Check API key authentication
         $apiKey = $request->getHeader('X-API-Key');
         if ($apiKey) {
-            return $this->validateApiKey($apiKey);
+            $result = $this->validateApiKey($apiKey);
+            
+            if ($result) {
+                $this->securityLogger->logAuthSuccess(
+                    $result['user_id'], 
+                    'api_key', 
+                    $ipAddress, 
+                    $userAgent
+                );
+                return true;
+            } else {
+                $this->securityLogger->logAuthFailure(
+                    'api_key', 
+                    'key', 
+                    'invalid_key', 
+                    $ipAddress, 
+                    $userAgent
+                );
+            }
         }
 
         return false;
@@ -124,20 +183,131 @@ class AuthenticationMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Validate JWT token (placeholder implementation).
+     * Validate session with security checks.
+     *
+     * @param RequestInterface $request Request object
+     * @return bool True if session is valid and secure
      */
-    private function validateJwtToken(string $token): bool
+    private function validateSession(RequestInterface $request): bool
     {
-        // TODO: Implement JWT validation
-        return false;
+        if (session_status() !== PHP_SESSION_ACTIVE || !isset($_SESSION['user_id'])) {
+            return false;
+        }
+
+        $ipAddress = $request->getClientIp();
+        $userAgent = $request->getUserAgent();
+
+        // Validate session IP (if IP validation is enabled)
+        if (isset($_SESSION['ip_address']) && $_SESSION['ip_address'] !== $ipAddress) {
+            // Allow for mobile/proxy IP changes with warning
+            $this->securityLogger->logSuspiciousActivity(
+                'session_ip_change',
+                [
+                    'old_ip' => $_SESSION['ip_address'],
+                    'new_ip' => $ipAddress,
+                    'session_id' => session_id()
+                ],
+                $ipAddress,
+                $_SESSION['user_id']
+            );
+            
+            // Update IP but continue (for mobile users)
+            $_SESSION['ip_address'] = $ipAddress;
+        }
+
+        // Validate session user agent (basic check)
+        if (isset($_SESSION['user_agent']) && $_SESSION['user_agent'] !== $userAgent) {
+            $this->securityLogger->logSuspiciousActivity(
+                'session_user_agent_change',
+                [
+                    'old_agent' => substr($_SESSION['user_agent'], 0, 100),
+                    'new_agent' => substr($userAgent, 0, 100),
+                    'session_id' => session_id()
+                ],
+                $ipAddress,
+                $_SESSION['user_id']
+            );
+        }
+
+        // Check session expiration
+        if (isset($_SESSION['expires_at']) && $_SESSION['expires_at'] < time()) {
+            session_destroy();
+            return false;
+        }
+
+        // Update last activity
+        $_SESSION['last_activity'] = time();
+        $_SESSION['ip_address'] = $ipAddress;
+        $_SESSION['user_agent'] = $userAgent;
+
+        return true;
     }
 
     /**
-     * Validate API key (placeholder implementation).
+     * Validate JWT token with comprehensive security checks.
+     *
+     * @param string $token JWT token
+     * @return array<string, mixed>|null Token payload if valid, null if invalid
      */
-    private function validateApiKey(string $apiKey): bool
+    private function validateJwtToken(string $token): ?array
     {
-        // TODO: Implement API key validation
-        return false;
+        $payload = $this->jwtService->validateToken($token);
+        
+        if (!$payload) {
+            $this->securityLogger->logJwtEvent(
+                'invalid',
+                'unknown',
+                null,
+                $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1'
+            );
+            return null;
+        }
+
+        $jti = $payload['jti'] ?? 'unknown';
+        $userId = $payload['user_id'] ?? null;
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+
+        // Check if token is blacklisted
+        if (isset($payload['jti']) && $this->jwtService->isTokenBlacklisted($payload['jti'])) {
+            $this->securityLogger->logJwtEvent('blacklisted', $jti, $userId, $ipAddress);
+            return null;
+        }
+
+        $this->securityLogger->logJwtEvent('validated', $jti, $userId, $ipAddress);
+        return $payload;
+    }
+
+    /**
+     * Validate API key with security checks.
+     *
+     * @param string $apiKey API key to validate
+     * @return array<string, mixed>|null API key data if valid, null if invalid
+     */
+    private function validateApiKey(string $apiKey): ?array
+    {
+        $apiKeyModel = ApiKey::validateKey($apiKey);
+        $ipAddress = $_SERVER['REMOTE_ADDR'] ?? '127.0.0.1';
+        
+        if (!$apiKeyModel) {
+            $this->securityLogger->logApiKeyEvent('invalid', null, null, $ipAddress);
+            return null;
+        }
+
+        $keyId = $apiKeyModel->getId();
+        $userId = $apiKeyModel->getAttribute('user_id');
+
+        // Check if API key is expired
+        if ($apiKeyModel->isExpired()) {
+            $this->securityLogger->logApiKeyEvent('expired', $keyId, $userId, $ipAddress);
+            return null;
+        }
+
+        $this->securityLogger->logApiKeyEvent('validated', $keyId, $userId, $ipAddress, $_SERVER['REQUEST_URI'] ?? null);
+        
+        return [
+            'user_id' => $userId,
+            'key_id' => $keyId,
+            'permissions' => $apiKeyModel->getPermissions()
+        ];
     }
 }

@@ -1,58 +1,75 @@
 <?php
-//// filepath: /Users/michaelkingsnorth/Development/sample_php_code/src/Models/Blog.php
+declare(strict_types=1);
+
 namespace App\Models;
 
-use App\Models;
 use App\Traits\Pagination;
 
 class Blog extends Base
 {
     use Pagination;
 
-    protected string $table = 'blogs';
+    protected static string $table = 'blogs';
+    
+    /** @var array<string> */
+    protected static array $fillable = [
+        'title',
+        'content',
+        'author_id',
+        'published',
+        'created_at',
+        'updated_at'
+    ];
+    
+    /** @var array<string> */
+    protected static array $encrypted = [];
+    
+    /** @var array<string> */
+    protected static array $hidden = [];
     
     /**
      * Retrieve all blog posts.
      *
-     * @return array
+     * @return array<static>
      */
-    public function findAllBlogs(): array
+    public static function findAllBlogs(): array
     {
-        return $this->findAll();
+        return static::all();
     }
     
     /**
      * Retrieve a single blog post by ID.
      *
      * @param int $id
-     * @return array|null
+     * @return static|null
      */
-    public function findBlogById(int $id): ?array
+    public static function findBlogById(int $id): ?static
     {
-        return $this->find($id);
+        return static::find($id);
     }
     
     /**
      * Create a new blog post.
      *
-     * @param array $data
-     * @return int New blog post ID
+     * @param array<string, mixed> $data
+     * @return static New blog post instance
      */
-    public function createBlog(array $data): int
+    public static function createBlog(array $data): static
     {
-        return $this->create($data);
+        return static::create($data);
     }
     
     /**
      * Update an existing blog post.
      *
      * @param int $id
-     * @param array $data
+     * @param array<string, mixed> $data
      * @return bool
      */
-    public function updateBlog(int $id, array $data): bool
+    public static function updateBlog(int $id, array $data): bool
     {
-        return $this->update($id, $data);
+        $blog = static::find($id);
+        return $blog ? $blog->update($data) : false;
     }
     
     /**
@@ -61,9 +78,10 @@ class Blog extends Base
      * @param int $id
      * @return bool
      */
-    public function deleteBlog(int $id): bool
+    public static function deleteBlog(int $id): bool
     {
-        return $this->delete($id);
+        $blog = static::find($id);
+        return $blog ? $blog->delete() : false;
     }
 
     /**
@@ -71,10 +89,10 @@ class Blog extends Base
      *
      * @param int $limit Number of records per page.
      * @param int $offset The offset from where to start retrieving records.
-     * @return array
+     * @return array<string, mixed>
      */
     public function findBlogsPaginated(int $limit, int $offset): array
     {
-        return $this->paginate($this->table, $limit, $offset);
+        return $this->paginate(static::$table, $limit, $offset);
     }
 }

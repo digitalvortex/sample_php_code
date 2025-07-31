@@ -1,41 +1,80 @@
 <?php
-//// filepath: /Users/michaelkingsnorth/Development/sample_php_code/src/Models/Level.php
+declare(strict_types=1);
 
 namespace App\Models;
 
 class Level extends Base
 {
-    protected string $table = 'levels';
+    protected static string $table = 'levels';
     
-
-    // Define what columns can be mass-assigned
-    protected array $fillable = [
-        'name'
+    /** @var array<string> */
+    protected static array $fillable = [
+        'name',
+        'created_at',
+        'updated_at'
     ];
+    
+    /** @var array<string> */
+    protected static array $encrypted = [];
+    
+    /** @var array<string> */
+    protected static array $hidden = [];
 
-    public function createLevel(array $data): int
+    /**
+     * Create a new level.
+     *
+     * @param array<string, mixed> $data
+     * @return static
+     */
+    public static function createLevel(array $data): static
     {
-        return $this->create($data);
+        return static::create($data);
     }
 
-    public function updateLevel(int $id, array $data): bool
+    /**
+     * Update an existing level.
+     *
+     * @param int $id
+     * @param array<string, mixed> $data
+     * @return bool
+     */
+    public static function updateLevel(int $id, array $data): bool
     {
-        return $this->update($id, $data);
+        $level = static::find($id);
+        return $level ? $level->update($data) : false;
     }
 
-    public function deleteLevel(int $id): bool
+    /**
+     * Delete a level.
+     *
+     * @param int $id
+     * @return bool
+     */
+    public static function deleteLevel(int $id): bool
     {
-        return $this->delete($id);
+        $level = static::find($id);
+        return $level ? $level->delete() : false;
     }
 
-    public function findLevelById(int $id): ?array
+    /**
+     * Find a level by ID.
+     *
+     * @param int $id
+     * @return static|null
+     */
+    public static function findLevelById(int $id): ?static
     {
-        return $this->find($id);
+        return static::find($id);
     }
 
-    public function findAllLevels(): array
+    /**
+     * Get all levels.
+     *
+     * @return array<static>
+     */
+    public static function findAllLevels(): array
     {
-        return $this->findAll();
+        return static::all();
     }
 
     // Optionally add helper methods

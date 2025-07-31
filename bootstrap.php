@@ -32,6 +32,16 @@ $container->register(EncryptionService::class, function (Container $c) {
     return new EncryptionService();
 }, true);
 
+// Register JWT Service
+$container->register(\App\Services\JwtService::class, function (Container $c) {
+    return new \App\Services\JwtService($c->get(EncryptionService::class));
+}, true);
+
+// Register Security Logger Service
+$container->register(\App\Services\SecurityLoggerService::class, function (Container $c) {
+    return new \App\Services\SecurityLoggerService();
+}, true);
+
 // Register all models from ModelsDefinitions
 use App\Definitions\ModelsDefinitions as MD;
 foreach (MD::getDefinitions() as $model => $factory) {
