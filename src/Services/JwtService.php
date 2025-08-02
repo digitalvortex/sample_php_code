@@ -5,8 +5,10 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Services\EncryptionService;
+use App\Models\JwtBlacklist;
 use InvalidArgumentException;
 use RuntimeException;
+use PDO;
 
 /**
  * JWT Service
@@ -23,14 +25,30 @@ class JwtService
     private int $defaultExpiry;
 
     /**
-     * @var array<string> Blacklisted tokens
+     * @var array<string> In-memory cache of blacklisted tokens
      */
-    private array $blacklistedTokens = [];
+    private array $blacklistedTokensCache = [];
 
-    public function __construct(EncryptionService $encryptionService)
+    public function __construct(EncryptionService $encryptionService, PDO $pdo)
     {
         $this->encryptionService = $encryptionService;
-        $this->secretKey = $_ENV['ENCRYPTION_KEY'] ?? throw new RuntimeException('JWT secret key not configured');
+        
+        // Initialize JwtBlacklist model
+        JwtBlacklist::initialize($pdo, $encryptionService);
+        
+        // Try ENCRYPTION_KEY first, then fallback to KEY
+        $this->secretKey = $_ENV['ENCRYPTION_KEY'] ?? $_ENV['KEY'] ?? null;
+        
+        if (!$this->secretKey) {
+            throw new RuntimeException(
+                'JWT secret key not configured. Please set ENCRYPTION_KEY in your .env file. ' .
+                'You can generate a key using: php tools/setkey.php'
+            );
+        }
+        
+        // Remove quotes if present in the key
+        $this->secretKey = trim($this->secretKey, '"');
+        
         $this->issuer = $_ENV['JWT_ISSUER'] ?? 'sample-php-mvc';
         $this->defaultExpiry = (int)($_ENV['JWT_EXPIRY'] ?? 3600); // 1 hour default
     }
@@ -108,7 +126,7 @@ class JwtService
             }
 
             // Check if token is blacklisted
-            if (isset($payload['jti']) && in_array($payload['jti'], $this->blacklistedTokens, true)) {
+            if (isset($payload['jti']) && $this->isTokenBlacklisted($payload['jti'])) {
                 return null;
             }
 
@@ -141,11 +159,18 @@ class JwtService
      * Blacklist a token by its JTI (JWT ID).
      *
      * @param string $jti JWT ID
+     * @param int $userId User ID who owns the token
+     * @param int $expiresAt Token expiration timestamp
+     * @param string|null $reason Reason for blacklisting
      */
-    public function blacklistToken(string $jti): void
+    public function blacklistToken(string $jti, int $userId, int $expiresAt, ?string $reason = null): void
     {
-        if (!in_array($jti, $this->blacklistedTokens, true)) {
-            $this->blacklistedTokens[] = $jti;
+        // Add to database
+        JwtBlacklist::blacklistToken($jti, $userId, $expiresAt, $reason);
+        
+        // Add to in-memory cache
+        if (!in_array($jti, $this->blacklistedTokensCache, true)) {
+            $this->blacklistedTokensCache[] = $jti;
         }
     }
 
@@ -157,7 +182,20 @@ class JwtService
      */
     public function isTokenBlacklisted(string $jti): bool
     {
-        return in_array($jti, $this->blacklistedTokens, true);
+        // Check in-memory cache first
+        if (in_array($jti, $this->blacklistedTokensCache, true)) {
+            return true;
+        }
+        
+        // Check database
+        $isBlacklisted = JwtBlacklist::isBlacklisted($jti);
+        
+        // Cache the result
+        if ($isBlacklisted && !in_array($jti, $this->blacklistedTokensCache, true)) {
+            $this->blacklistedTokensCache[] = $jti;
+        }
+        
+        return $isBlacklisted;
     }
 
     /**
@@ -177,7 +215,12 @@ class JwtService
 
         // Blacklist the old token
         if (isset($payload['jti'])) {
-            $this->blacklistToken($payload['jti']);
+            $this->blacklistToken(
+                $payload['jti'], 
+                $payload['user_id'], 
+                $payload['exp'], 
+                'Token refreshed'
+            );
         }
 
         // Create new token
@@ -210,6 +253,53 @@ class JwtService
     {
         $payload = $this->validateToken($token);
         return $payload['permissions'] ?? [];
+    }
+
+    /**
+     * Revoke a token (add to blacklist).
+     *
+     * @param string $token JWT token to revoke
+     * @param string|null $reason Reason for revocation
+     * @return bool True if token was successfully revoked
+     */
+    public function revokeToken(string $token, ?string $reason = null): bool
+    {
+        $payload = $this->validateToken($token);
+        
+        if (!$payload || !isset($payload['jti'], $payload['user_id'], $payload['exp'])) {
+            return false;
+        }
+        
+        $this->blacklistToken(
+            $payload['jti'],
+            $payload['user_id'],
+            $payload['exp'],
+            $reason ?? 'Token revoked'
+        );
+        
+        return true;
+    }
+
+    /**
+     * Clean up expired blacklisted tokens.
+     * Should be called periodically to maintain database performance.
+     *
+     * @return int Number of tokens cleaned up
+     */
+    public function cleanupExpiredTokens(): int
+    {
+        return JwtBlacklist::cleanupExpired();
+    }
+
+    /**
+     * Get all blacklisted tokens for a user.
+     *
+     * @param int $userId User ID
+     * @return array<JwtBlacklist>
+     */
+    public function getUserBlacklistedTokens(int $userId): array
+    {
+        return JwtBlacklist::getByUserId($userId);
     }
 
     /**

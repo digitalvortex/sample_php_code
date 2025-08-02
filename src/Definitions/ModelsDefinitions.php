@@ -10,6 +10,7 @@ use App\Models\Blog;
 use App\Models\Session;
 use App\Models\Contact;
 use App\Models\ApiKey;
+use App\Models\JwtBlacklist;
 use App\Services\EncryptionService;
 use PDO;
 
@@ -41,6 +42,10 @@ class ModelsDefinitions
             ApiKey::class => function (Container $c) {
                 ApiKey::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
                 return new ApiKey();
+            },
+            JwtBlacklist::class => function (Container $c) {
+                JwtBlacklist::initialize($c->get(PDO::class), $c->get(EncryptionService::class));
+                return new JwtBlacklist();
             },
         ];
     }

@@ -39,7 +39,8 @@ abstract class Base implements ModelInterface
         'contacts',
         'sessions',
         'levels',
-        'api_keys'
+        'api_keys',
+        'jwt_blacklist'
     ];
     
     /**
