@@ -42,6 +42,26 @@ $container->register(\App\Services\SecurityLoggerService::class, function (Conta
     return new \App\Services\SecurityLoggerService();
 }, true);
 
+// Register Rate Limit Service
+$container->register(\App\Services\RateLimitService::class, function (Container $c) {
+    return new \App\Services\RateLimitService();
+}, true);
+
+// Register Brute Force Protection Service
+$container->register(\App\Services\BruteForceProtectionService::class, function (Container $c) {
+    return new \App\Services\BruteForceProtectionService(
+        $c->get(\App\Services\SecurityLoggerService::class)
+    );
+}, true);
+
+// Register Security Monitoring Service
+$container->register(\App\Services\SecurityMonitoringService::class, function (Container $c) {
+    return new \App\Services\SecurityMonitoringService(
+        $c->get(\App\Services\SecurityLoggerService::class),
+        $c->get(\App\Services\BruteForceProtectionService::class)
+    );
+}, true);
+
 // Register Authentication Middleware
 $container->register(\App\Middleware\AuthenticationMiddleware::class, function (Container $c) {
     return new \App\Middleware\AuthenticationMiddleware(
@@ -54,6 +74,16 @@ $container->register(\App\Middleware\AuthenticationMiddleware::class, function (
 $container->register(\App\Middleware\CSRFMiddleware::class, function (Container $c) {
     return new \App\Middleware\CSRFMiddleware(
         $c->get(\App\Security\CSRFToken::class)
+    );
+}, true);
+
+// Register Rate Limit Middleware
+$container->register(\App\Middleware\RateLimitMiddleware::class, function (Container $c) {
+    return new \App\Middleware\RateLimitMiddleware(
+        $c->get(\App\Services\RateLimitService::class),
+        $c->get(\App\Services\SecurityLoggerService::class),
+        $c->get(\App\Services\BruteForceProtectionService::class),
+        $c->get(\App\Services\SecurityMonitoringService::class)
     );
 }, true);
 

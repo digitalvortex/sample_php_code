@@ -308,4 +308,15 @@ class SecurityLoggerService
     {
         return $this->logPath;
     }
+
+    /**
+     * Log generic security events.
+     *
+     * @param string $event Event type
+     * @param array $context Event context and details
+     */
+    public function logSecurityEvent(string $event, array $context = []): void
+    {
+        $this->log($event, $context);
+    }
 }

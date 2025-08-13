@@ -130,3 +130,102 @@ This is a custom PHP 8.3+ MVC framework built without third-party dependencies (
 
 ### Language and Tooling
 - We are using PHP 8.4 strict, we are not able to add any new third party libraries to composer, so we are writing raw PHP 8.4 code using TDD and all new code should be docmented and have PHP unit tests
+
+## Agent Collaboration Guidelines
+
+### Agent Coordination & Communication
+- **Cross-Agent Requirements**: All agents MUST adhere to project constraints defined in this file
+- **Security-First Approach**: OWASP security auditor recommendations override all other considerations
+- **Code Quality Standards**: PHP QA testing expert validates all code before deployment
+- **Documentation Requirements**: PHP MVC blog writer documents significant features and architectural decisions
+
+### Agent Workflow Integration
+
+1. **Development Flow**:
+   - PHP MVC Expert: Designs architecture and implements features
+   - OWASP Security Auditor: Reviews security implications BEFORE implementation
+   - PHP QA Testing Expert: Creates comprehensive tests for all new code
+   - PHP MVC Blog Writer: Documents features for developer education
+
+2. **Quality Gates** (All agents must enforce):
+   - `declare(strict_types=1)` in all PHP files
+   - PHPStan level 9 compliance
+   - Minimum 95% test coverage
+   - OWASP security compliance
+   - No third-party production dependencies
+
+3. **Communication Protocol**:
+   - Agents share context through code comments and documentation
+   - Security vulnerabilities trigger immediate cross-agent alerts
+   - Test failures block all further development
+   - Documentation updates required for all public APIs
+
+### Duplicate Code Prevention
+
+1. **Code Reuse Strategy**:
+   - Check existing services in `src/Services/` before creating new ones
+   - Use base classes and traits for shared functionality
+   - Implement DRY principle across all agent contributions
+   - Review `src/Core/` components for existing utilities
+
+2. **Pattern Consistency**:
+   - Follow established patterns in `src/Models/Base.php`
+   - Use dependency injection via `bootstrap.php` definitions
+   - Maintain consistent error handling patterns
+   - Reuse validation logic from `src/Services/UserValidationService.php`
+
+### Security Requirements Enforcement
+
+1. **Mandatory Security Checks** (All agents):
+   - Input validation on all user data
+   - Output encoding for XSS prevention
+   - CSRF token validation on state-changing operations
+   - SQL injection prevention through prepared statements
+   - Authentication and authorization checks
+
+2. **Security Standards**:
+   - Encryption: X25519, Ed25519, and sodium library
+   - Password: ARGON2ID hashing only
+   - Sessions: Secure, httponly, samesite cookies
+   - Rate limiting: Implement on all public endpoints
+   - Logging: Security events to `SecurityLoggerService`
+
+### Agent-Specific Responsibilities
+
+#### PHP MVC Expert
+- Ensure architectural consistency
+- Implement secure design patterns
+- Optimize performance while maintaining security
+- Coordinate with other agents for holistic solutions
+
+#### OWASP Security Auditor
+- **VETO POWER**: Can block any code with security vulnerabilities
+- Perform security reviews on ALL authentication code
+- Validate encryption implementations
+- Monitor for OWASP Top 10 vulnerabilities
+
+#### PHP QA Testing Expert
+- Enforce 95% minimum test coverage
+- Validate PHPStan level 9 compliance
+- Create security-focused test cases
+- Ensure all code examples in documentation are tested
+
+#### PHP MVC Blog Writer
+- Document security best practices
+- Create developer education content
+- Ensure code examples follow all standards
+- Update documentation with architectural decisions
+
+### Conflict Resolution
+
+1. **Priority Order** (highest to lowest):
+   1. Security vulnerabilities (OWASP Security Auditor)
+   2. Test failures (PHP QA Testing Expert)
+   3. Architectural consistency (PHP MVC Expert)
+   4. Documentation clarity (PHP MVC Blog Writer)
+
+2. **Escalation Path**:
+   - Security issues: Immediate halt and remediation
+   - Quality issues: Block deployment until resolved
+   - Architecture conflicts: Consensus through design review
+   - Documentation gaps: Complete before feature release

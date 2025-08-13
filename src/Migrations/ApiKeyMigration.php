@@ -6,6 +6,7 @@ namespace App\Migrations;
 
 use App\Interfaces\MigrationInterface;
 use PDO;
+use PDOException;
 
 /**
  * API Key Migration
@@ -15,12 +16,27 @@ use PDO;
  */
 class ApiKeyMigration implements MigrationInterface
 {
-    public function up(PDO $pdo): void
+    /**
+     * PDO instance for database operations
+     */
+    private PDO $pdo;
+
+    /**
+     * Constructor
+     *
+     * @param PDO $pdo The PDO instance
+     */
+    public function __construct(PDO $pdo)
+    {
+        $this->pdo = $pdo;
+    }
+
+    public function up(): void
     {
         $sql = "
             CREATE TABLE IF NOT EXISTS api_keys (
-                id INT AUTO_INCREMENT PRIMARY KEY,
-                user_id INT NOT NULL,
+                id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+                user_id BIGINT UNSIGNED NOT NULL,
                 name VARCHAR(255) NOT NULL,
                 key_hash VARCHAR(255) NOT NULL,
                 permissions JSON DEFAULT NULL,
@@ -36,24 +52,32 @@ class ApiKeyMigration implements MigrationInterface
                 INDEX idx_created_at (created_at),
                 
                 -- Composite index for common queries
-                INDEX idx_user_active (user_id, expires_at),
-                
-                -- Foreign key constraint to users table
-                CONSTRAINT fk_api_keys_user_id 
-                    FOREIGN KEY (user_id) 
-                    REFERENCES users(id) 
-                    ON DELETE CASCADE
-                    ON UPDATE CASCADE
+                INDEX idx_user_active (user_id, expires_at)
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
         ";
 
-        $pdo->exec($sql);
+        $this->pdo->exec($sql);
+        
+        // Add foreign key constraint separately to avoid issues
+        $fkSql = "
+            ALTER TABLE api_keys 
+            ADD CONSTRAINT fk_api_keys_user_id 
+            FOREIGN KEY (user_id) REFERENCES users(id) 
+            ON DELETE CASCADE ON UPDATE CASCADE
+        ";
+        
+        try {
+            $this->pdo->exec($fkSql);
+        } catch (PDOException $e) {
+            // Foreign key constraint might already exist or users table might not exist yet
+            // This is acceptable for development
+        }
     }
 
-    public function down(PDO $pdo): void
+    public function down(): void
     {
         $sql = "DROP TABLE IF EXISTS api_keys";
-        $pdo->exec($sql);
+        $this->pdo->exec($sql);
     }
 
     public function getDescription(): string

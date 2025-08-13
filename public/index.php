@@ -20,8 +20,6 @@ if ($isDevelopment) {
     ini_set('error_log', '/var/log/php-mvc-errors.log');
 }
 
-require_once __DIR__ . '/../bootstrap.php';
-
 $container = require __DIR__ . '/../bootstrap.php';
 
 $router = $container->get(App\Core\Router::class);

@@ -16,14 +16,14 @@ use App\Interfaces\MigrationInterface;
 class LevelMigration implements MigrationInterface
 {
     /**
-     * @var PDO The PDO instance for database connection.
+     * PDO instance for database operations
      */
     private PDO $pdo;
 
     /**
-     * LevelMigration constructor.
+     * Constructor
      *
-     * @param PDO $pdo The PDO instance for database connection.
+     * @param PDO $pdo The PDO instance
      */
     public function __construct(PDO $pdo)
     {

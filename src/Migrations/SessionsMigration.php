@@ -16,14 +16,14 @@ use App\Interfaces\MigrationInterface;
 class SessionsMigration implements MigrationInterface
 {
     /**
-     * @var PDO The PDO instance for database connection.
+     * PDO instance for database operations
      */
     private PDO $pdo;
 
     /**
-     * SessionsMigration constructor.
+     * Constructor
      *
-     * @param PDO $pdo The PDO instance for database connection.
+     * @param PDO $pdo The PDO instance
      */
     public function __construct(PDO $pdo)
     {
@@ -38,7 +38,7 @@ class SessionsMigration implements MigrationInterface
     public function up(): void
     {
         $sql = <<<SQL
-        CREATE TABLE sessions (
+        CREATE TABLE IF NOT EXISTS sessions (
             id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
             session_id VARCHAR(255) NOT NULL,
             user_id BIGINT UNSIGNED NULL,

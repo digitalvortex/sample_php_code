@@ -12,6 +12,7 @@ use App\Services\UserValidationService;
 use App\Services\SessionService;
 use App\Services\SecurityLoggerService;
 use App\Security\CSRFToken;
+use App\Middleware\RateLimitMiddleware;
 
 /**
  * Authentication Controller
@@ -25,17 +26,20 @@ class AuthController extends Controller
     private SessionService $sessionService;
     private SecurityLoggerService $securityLogger;
     private CSRFToken $csrfToken;
+    private RateLimitMiddleware $rateLimitMiddleware;
 
     public function __construct(
         UserValidationService $validationService,
         SessionService $sessionService,
         SecurityLoggerService $securityLogger,
-        CSRFToken $csrfToken
+        CSRFToken $csrfToken,
+        RateLimitMiddleware $rateLimitMiddleware
     ) {
         $this->validationService = $validationService;
         $this->sessionService = $sessionService;
         $this->securityLogger = $securityLogger;
         $this->csrfToken = $csrfToken;
+        $this->rateLimitMiddleware = $rateLimitMiddleware;
     }
 
     /**
@@ -156,6 +160,9 @@ class AuthController extends Controller
                 $userAgent
             );
 
+            // Record failed attempt for rate limiting
+            $this->rateLimitMiddleware->recordFailedAttempt($request);
+
             return [
                 'view' => 'auth/login',
                 'data' => [
@@ -177,6 +184,9 @@ class AuthController extends Controller
                 $userAgent
             );
 
+            // Record failed attempt for rate limiting
+            $this->rateLimitMiddleware->recordFailedAttempt($request);
+
             return [
                 'view' => 'auth/login',
                 'data' => [
@@ -197,6 +207,9 @@ class AuthController extends Controller
                 $ipAddress,
                 $userAgent
             );
+
+            // Record failed attempt for rate limiting
+            $this->rateLimitMiddleware->recordFailedAttempt($request);
 
             return [
                 'view' => 'auth/login',
